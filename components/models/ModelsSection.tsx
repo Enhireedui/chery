@@ -311,10 +311,18 @@ export default function ModelsSection() {
       const w = box?.getBoundingClientRect().width ?? 0;
       boxWRef.current = w;
       tirePxRef.current = anchor ? (w * anchor.tirePct) / 100 : 0;
+      /* Дугуйн шугам (хэсгийн дээрээс px) — утасны дэвсгэрийн зам
+         үүнийг дагана (`site.css` §22a1) */
+      const sec = sectionRef.current;
+      if (box && sec) {
+        const b = box.getBoundingClientRect(), r = sec.getBoundingClientRect();
+        sec.style.setProperty("--wheel-y", `${Math.round(b.top - r.top + b.height * 0.93)}px`);
+      }
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(trackEl);
+    if (sectionRef.current) ro.observe(sectionRef.current);
     return () => ro.disconnect();
   }, [models, safeActive]);
 

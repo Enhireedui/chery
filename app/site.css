@@ -2821,12 +2821,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 }
 @media (max-width: 767px) {
   /* Машин тайзны доод хэсэгт, зам дээр сууна */
-  .ms-stage { min-height: min(96vw, 440px); }
-  .ms-stage .ms-car { align-items: flex-end; padding-bottom: clamp(18px, 6vw, 30px); }
   /* 9:16 плейт: зам зургийн 57–69%-д. Дээрээс тулгаж 117% өндөрт
      сунгахад замын дунд (63%) нь дугуйн түвшинд (~74%) буух ба
      доод бүдгэрсэн өвс нь CTA, сонгогчийн ард үлдэнэ. */
-  .ms-bg__pic { top: 0; bottom: auto; height: 117%; }
+  .ms-bg__pic {
+    bottom: auto; height: 130%;
+    /* зам зургийн 54–82%-д, дугуй замын ойр хэсэгт (62%) — 62% × 130% */
+    top: calc(var(--wheel-y, 54%) - 80.6%);
+  }
   .ms-bg__pic img { object-position: 50% 0; }
   .ms-bg::after { background: linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.2) 40%, rgba(255,255,255,0) 58%); }
 }
@@ -2919,12 +2921,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
     .ms-car__box { width: min(100%, calc(88cqh * var(--car-ar)), 74cqw); }
   }
 }
-/* Утас: машин 84% — хоёр захад гэр, дээр нь уул, хот харагдана */
-@supports (height: 1cqh) {
-  @media (max-width: 767px) {
-    .ms-car__box { width: min(84%, calc(62cqh * var(--car-ar))); }
-  }
-}
+
 
 /* ⚠ `<picture>` нь inline элемент тул түүн доторх зургийн
    `height: 100%` шийдэгддэггүй байв — зураг ачаалагдаагүй үедээ
@@ -3192,6 +3189,12 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   .ms {
     grid-template-rows: auto auto auto;
     min-height: 0;
+  }
+  /* Утас: нэг дэлгэцэнд — бичвэр, шууд доор нь машин, доод талд CTA,
+     сонгогч. Илүү зай нь машин ба CTA-ийн хооронд (бүдэг өвс) очно. */
+  @media (max-width: 767px) {
+    .ms { grid-template-rows: auto auto 1fr; min-height: 100svh; }
+    .ms-foot { align-self: end; }
   }
   .ms-stage { height: calc(100vw / var(--car-ar) + clamp(52px, 11vw, 120px)); }
 }

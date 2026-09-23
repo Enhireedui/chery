@@ -18,8 +18,8 @@
 export default function MongoliaScene() {
   return (
     <picture data-depth="0.4" className="ms-bg__pic">
-      <source media="(max-width: 767px)" type="image/avif" srcSet="/assets/img/ms-gold-916.avif" />
-      <source media="(max-width: 767px)" type="image/webp" srcSet="/assets/img/ms-gold-916.webp" />
+      <source media="(max-width: 767px)" type="image/avif" srcSet="/assets/img/ms-gold-road.avif" />
+      <source media="(max-width: 767px)" type="image/webp" srcSet="/assets/img/ms-gold-road.webp" />
       <source type="image/avif" srcSet="/assets/img/ms-gold.avif" />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
