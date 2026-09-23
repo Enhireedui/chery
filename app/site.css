@@ -915,7 +915,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    зүүн талаас авна: 1366×768 (хамгийн их хайчлалт) дээр ч машин
    бүтнээрээ үлдэнэ. */
 @media (min-width: 768px) {
-  .hero--home .hero__slide:is([data-model="tiggo-7"], [data-model="tiggo-4"], [data-model="tiggo-2"]) img {
+  .hero--home .hero__slide:is([data-model="tiggo-8"], [data-model="tiggo-7"], [data-model="tiggo-4"], [data-model="tiggo-2"]) img {
     object-position: 70% 54%;
   }
 }
@@ -1446,11 +1446,6 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   /* Машин зургийн 48–63% хооронд байдаг. 62% нь машиныг бүтнээр,
      дээр нь тэнгэр, доор нь хучилт үлдээнэ. */
   .hero--home .hero__slide img { object-position: 50% 62%; }
-  /* Tiggo 8-ын кадарт машин бусдаасаа ДЭЭГҮҮР зогсдог — зургийн
-     өндрийн 52%-д төвтэй, бусад кадрынх 55–61%-д. Тиймээс
-     зөвхөн энэ кадрыг доошлуулав. `object-position`-ыг багасгах
-     нь зургийн ДЭЭД хэсгийг илүү харуулна = машин доошлоно. */
-  .hero--home .hero__slide[data-model="tiggo-8"] img { object-position: 50% 52%; }
   /* Tiggo 7-гийн кадарт машин бусдаасаа ДООГУУР (зургийн 61%-д
      төвтэй) тул ~30px дээшлүүлэв. */
   .hero--home .hero__slide[data-model="tiggo-7"] img { object-position: 50% 76%; }
