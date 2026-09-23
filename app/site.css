@@ -2825,9 +2825,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
      сунгахад замын дунд (63%) нь дугуйн түвшинд (~74%) буух ба
      доод бүдгэрсэн өвс нь CTA, сонгогчийн ард үлдэнэ. */
   .ms-bg__pic {
-    bottom: auto; height: 130%;
-    /* зам зургийн 54–82%-д, дугуй замын ойр хэсэгт (62%) — 62% × 130% */
-    top: calc(var(--wheel-y, 54%) - 80.6%);
+    bottom: auto; height: 128%;
+    /* зам зургийн 55–65%-д, дугуй замын ойр хэсэгт (62%) — 62% × 128%;
+       доор нь хөдөлгөөнөөр бүдгэрсэн өвс CTA, сонгогчийн ард */
+    top: calc(var(--wheel-y, 54%) - 79.4%);
   }
   .ms-bg__pic img { object-position: 50% 0; }
   .ms-bg::after { background: linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.2) 40%, rgba(255,255,255,0) 58%); }
