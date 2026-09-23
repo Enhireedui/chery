@@ -2811,13 +2811,13 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    хумиж, баруун захад цайвар зурвас үлдээж байв */
 .ms-bg__pic {
   display: block; position: absolute; left: -3%; bottom: 0;
-  width: 106%; max-width: none; height: 134%;
+  width: 106%; max-width: none; height: 110%;
 }
 .ms-bg__pic img { object-fit: cover; object-position: 50% 100%; }
 /* дээд хэсэгт цэсний дор тэнгэр цайварлана — бичвэр уншигдана */
 .ms-bg::after {
   content: ""; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 32%);
+  background: linear-gradient(180deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 34%);
 }
 @media (max-width: 767px) {
   /* Машин тайзны доод хэсэгт, зам дээр сууна */
