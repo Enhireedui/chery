@@ -79,8 +79,8 @@ const DURATION = 1500;
 const DURATION_SMALL = 1340;
 /** Дугуй биеэсээ хойш дуусна (ZA: 1.3s vs 1.2s) */
 const WHEEL_EXTRA = 100;
-/** Тайзны ойр давхаргын гулсалт, viewBox-ийн нэгжээр (1600 өргөнөөс). */
-const SCENE_SHIFT = 90;
+/** Тайзны зургийн гулсалт, px (depth-ээр үржигдэнэ). */
+const SCENE_SHIFT = 60;
 /* Хөдөлгөөн багасгасан үед: ХАСАХГҮЙ, БОГИНОСГОНО. Машин аль зүг рүү
    шилжсэн нь энэ хэсгийн АГУУЛГА мөн — бүдгэрэлтээр солих нь утгыг нь
    алдагдуулна. Зам бүтэн хэвээр, зөвхөн хурд буурна. */
@@ -394,7 +394,7 @@ export default function ModelsSection() {
          гулсана: ойр нь их, алс нь бага — «машинтай хамт ирэв». */
       ...(reduce
         ? []
-        : Array.from(sceneRef.current?.querySelectorAll<SVGGElement>("[data-depth]") ?? []).map(
+        : Array.from(sceneRef.current?.querySelectorAll<HTMLElement>("[data-depth]") ?? []).map(
             (g) => {
               const shift = nav.dir * SCENE_SHIFT * Number(g.dataset.depth ?? 0);
               return g.animate(

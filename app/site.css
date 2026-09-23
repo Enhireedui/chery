@@ -2800,10 +2800,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 /* ---------- 22a1. МОНГОЛ ТАЙЗ ----------
    `components/models/MongoliaScene.tsx`. `.ms-scene` нь `.ms-car`-тай
    ИЖИЛ байрлал, padding, container-тай тул доторх `.ms-car__box` нь
-   машины хайрцагтай пиксел түвшинд давхцана. Чимэглэл нь хайрцгаас
-   30%-иар хоёр тийш гарч, газрын шугам (viewBox y=640) нь хайрцгийн
-   92%-д — дугуйн доор — сууна: `bottom: 8%` + өөрийн өндрийн
-   60/700-оор доош. */
+   машины хайрцагтай пиксел түвшинд давхцана. Зураг нь хайрцгаас
+   30%-иар хоёр тийш гарч, зам нь дугуйн доор сууна: зургийн доод
+   ирмэг хайрцгийн 92%-д (`bottom: 8%`), дараа нь өөрийн өндрийн 12%-
+   иар доош — зургийн 88%-ийн шугам (замын дунд) дугуйтай таарна. */
 .ms-scene {
   position: absolute; inset: 0; z-index: 0;
   display: flex; align-items: center; justify-content: center;
@@ -2822,12 +2822,18 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 }
 .ms-scene__art {
   position: absolute; left: -30%; bottom: 8%;
-  width: 160%; height: auto; aspect-ratio: 1600 / 700;
-  transform: translateY(8.571%);
-  overflow: visible;
+  width: 160%; aspect-ratio: 2400 / 1029;
+  transform: translateY(12%);
 }
-/* Утас: босоо зохиомж (viewBox 1000×800, газар y=680 → 15%-иар
-   доош). Хайрцгаас 12.5%-иар хоёр тийш гарна. */
+.ms-scene__art picture, .ms-scene__art img { display: block; width: 100%; height: 100%; }
+.ms-scene__art img {
+  object-fit: cover;
+  /* зургийн дээд, доод ирмэг хуудасны цагаан руу уусна — хатуу шугам үлдэхгүй */
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 24%, #000 86%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 24%, #000 86%, transparent);
+}
+/* Утас: 4:3 зохиомж, зам 71–100% → 84%-ийн шугам дугуйтай таарна.
+   Хайрцгаас 12.5%-иар хоёр тийш гарна. */
 .ms-scene__art--tall { display: none; }
 @media (max-width: 767px) {
   /* Тайз өндөр болж, чимэглэл машины дээгүүр амьсгалтай харагдана;
@@ -2850,8 +2856,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   .ms-scene__art--tall {
     display: block;
     left: -12.5%; width: 125%;
-    aspect-ratio: 1000 / 800;
-    transform: translateY(15%);
+    aspect-ratio: 4 / 3;
+    transform: translateY(16%);
   }
 }
 
