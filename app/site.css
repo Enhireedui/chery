@@ -2823,7 +2823,11 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   /* Машин тайзны доод хэсэгт, зам дээр сууна */
   .ms-stage { min-height: min(96vw, 440px); }
   .ms-stage .ms-car { align-items: flex-end; padding-bottom: clamp(18px, 6vw, 30px); }
-  .ms-bg__pic { height: 100%; }
+  /* 9:16 плейт: зам зургийн 57–69%-д. Дээрээс тулгаж 117% өндөрт
+     сунгахад замын дунд (63%) нь дугуйн түвшинд (~74%) буух ба
+     доод бүдгэрсэн өвс нь CTA, сонгогчийн ард үлдэнэ. */
+  .ms-bg__pic { top: 0; bottom: auto; height: 117%; }
+  .ms-bg__pic img { object-position: 50% 0; }
   .ms-bg::after { background: linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.2) 40%, rgba(255,255,255,0) 58%); }
 }
 
