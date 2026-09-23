@@ -2831,9 +2831,33 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   transform: translateY(8.571%);
   overflow: visible;
 }
-/* Утсан дээр хайрцаг нарийн тул тэнгэр, хот илүү харагдах хэрэгтэй */
+/* Утас: босоо зохиомж (viewBox 1000×800, газар y=680 → 15%-иар
+   доош). Хайрцгаас 12.5%-иар хоёр тийш гарна. */
+.ms-scene__art--tall { display: none; }
 @media (max-width: 767px) {
-  .ms-scene__art { left: -45%; width: 190%; }
+  /* Тайз өндөр болж, чимэглэл машины дээгүүр амьсгалтай харагдана;
+     ирмэгийн уусалт нимгэн — нарийн дэлгэцэнд өргөн уусалт бүхэл
+     зургийг бүдгэрүүлж байв. */
+  .ms-stage { min-height: min(96vw, 440px); }
+  /* Машин тайзны доод хэсэгт сууна — дээрх зай бүхэлдээ уул, хот,
+     тэнгэрт; доороо хоосон зурвас үлдэхгүй. `.ms-scene` ижил
+     байрлалтай тул газрын шугам дугуйтай таарсаар. */
+  .ms-stage .ms-car, .ms-stage .ms-scene { align-items: flex-end; padding-bottom: clamp(18px, 6vw, 30px); }
+  .ms-scene {
+    -webkit-mask-image:
+      linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent),
+      linear-gradient(180deg, transparent, #000 8%, #000 94%, transparent);
+    mask-image:
+      linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent),
+      linear-gradient(180deg, transparent, #000 8%, #000 94%, transparent);
+  }
+  .ms-scene__art--wide { display: none; }
+  .ms-scene__art--tall {
+    display: block;
+    left: -12.5%; width: 125%;
+    aspect-ratio: 1000 / 800;
+    transform: translateY(15%);
+  }
 }
 
 
@@ -2911,6 +2935,12 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 @supports (height: 1cqh) {
   @media (min-width: 1000px) {
     .ms-car__box { width: min(100%, calc(88cqh * var(--car-ar)), 74cqw); }
+  }
+}
+/* Утас: машин 84% — хоёр захад гэр, дээр нь уул, хот харагдана */
+@supports (height: 1cqh) {
+  @media (max-width: 767px) {
+    .ms-car__box { width: min(84%, calc(62cqh * var(--car-ar))); }
   }
 }
 
