@@ -909,6 +909,16 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    `center` бол энд БУРУУ — зохиомжийг эвдэнэ. */
 .hero--home .hero__slide img { object-fit: cover; object-position: 22% 54%; }
 .hero:not(.hero--home) .hero__slide img { object-fit: cover; object-position: 50% 50%; }
+/* Tiggo 7 · 4 · 2-ын кадар (Улаанбаатар · Тэрэлж · өвлийн гудамж) нь
+   машиныг АЛЬ ХЭДИЙН баруун тийш, зүүн талыг бичвэрт чөлөөтэй
+   зурсан. 22% нь тэднийг баруун ирмэгээр тасалдаг тул хайчлалтыг
+   зүүн талаас авна: 1366×768 (хамгийн их хайчлалт) дээр ч машин
+   бүтнээрээ үлдэнэ. */
+@media (min-width: 768px) {
+  .hero--home .hero__slide:is([data-model="tiggo-7"], [data-model="tiggo-4"], [data-model="tiggo-2"]) img {
+    object-position: 70% 54%;
+  }
+}
 
 /* ---------- ХӨШИГ ----------
    §2: «subtle dark cinematic overlay only where necessary». Илт

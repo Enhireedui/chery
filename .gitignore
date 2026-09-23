@@ -44,3 +44,4 @@ desktop.ini
 *.log
 npm-debug.log*
 _*.html
+_hero-gen/

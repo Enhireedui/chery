@@ -113,7 +113,7 @@ export default function HomeHero() {
                   <source type="image/avif" {...img(`${s.img}.avif`)} />
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    alt={`CHERY ${s.model} — гадна тал`}
+                    alt={`CHERY ${s.model} — ${s.scene}`}
                     {...(isFirst
                       ? { src: src(`${s.img}.webp`), fetchPriority: "high" as const }
                       : {

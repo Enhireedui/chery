@@ -42,6 +42,8 @@ export interface Slide {
   model: string;
   line: string;
   img: string;
+  /** Кадрын байршил — зургийн `alt`-д орно. */
+  scene: string;
 }
 
 export interface StoryItem {
@@ -251,10 +253,10 @@ export const footerLinks: NavItem[] = [
    тэнд хэрэглэгч үнэ, хэмжээгээр харьцуулдаг тул өсөх дараалал
    зөв. Хоёр дараалал ЗОРИУД өөр. */
 export const slides: Slide[] = [
-  { id: "tiggo-8", model: "Tiggo 8", line: "7 суудалтай гэр бүлийн SUV", img: "hero-t8" },
-  { id: "tiggo-7", model: "Tiggo 7", line: "Дэвшилтэт технологитой mid-size SUV", img: "hero-t7" },
-  { id: "tiggo-4", model: "Tiggo 4", line: "Өдөр тутмын хэрэглээнд тохиромжтой", img: "hero-t4" },
-  { id: "tiggo-2", model: "Tiggo 2", line: "Хотын авсаархан SUV", img: "hero-t2" },
+  { id: "tiggo-8", model: "Tiggo 8", line: "7 суудалтай гэр бүлийн SUV", img: "hero-t8", scene: "орчин үеийн байшингийн гадна" },
+  { id: "tiggo-7", model: "Tiggo 7", line: "Дэвшилтэт технологитой mid-size SUV", img: "hero-t7", scene: "Улаанбаатар хотод, үдшийн бүрийд" },
+  { id: "tiggo-4", model: "Tiggo 4", line: "Өдөр тутмын хэрэглээнд тохиромжтой", img: "hero-t4", scene: "Тэрэлжийн хөндийд, өглөөний нарны гэрэлд" },
+  { id: "tiggo-2", model: "Tiggo 2", line: "Хотын авсаархан SUV", img: "hero-t2", scene: "өвлийн өглөө, цастай гудамжинд" },
 ];
 
 /* ============================================================
