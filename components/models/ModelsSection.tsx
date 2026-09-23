@@ -584,6 +584,10 @@ export default function ModelsSection() {
       {/* Орчны давхарга — кадрын ЗАХААР л тавигдана (винет маск), тиймээс
           машины эргэн тойрны «өрөө» өөрчлөгдөх ба машин өөрөө хөндөгдөхгүй. */}
       <div className="ms-ambient" aria-hidden />
+      {/* Монгол тайз — бүтэн хэсгийн дэвсгэр, солих үед бага зэрэг гулсана */}
+      <div className="ms-bg" ref={sceneRef} aria-hidden>
+        <MongoliaScene />
+      </div>
       {/* ---------- Таних блок ---------- */}
       <div className="container">
         <ModelInfo key={active.id} model={active} dir={nav.dir} />
@@ -613,13 +617,6 @@ export default function ModelsSection() {
         >
           <Chevron d="M15 6l-6 6 6 6" />
         </button>
-
-        {/* Монгол тайз — машины ард, солих үед давхаргаараа гулсана */}
-        <div className="ms-scene" ref={sceneRef} aria-hidden>
-          <div className="ms-car__box ms-scene__box">
-            <MongoliaScene />
-          </div>
-        </div>
 
         <div className="ms-stage__track" ref={trackRef}>
           {models.map((m, i) => {

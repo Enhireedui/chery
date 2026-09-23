@@ -2797,70 +2797,47 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 
 .ms-stage__track { position: relative; height: 100%; overflow: hidden; z-index: 1; }
 
-/* ---------- 22a1. МОНГОЛ ТАЙЗ ----------
-   `components/models/MongoliaScene.tsx`. `.ms-scene` нь `.ms-car`-тай
-   ИЖИЛ байрлал, padding, container-тай тул доторх `.ms-car__box` нь
-   машины хайрцагтай пиксел түвшинд давхцана. Зураг нь хайрцгаас
-   30%-иар хоёр тийш гарч, зам нь дугуйн доор сууна: зургийн доод
-   ирмэг хайрцгийн 92%-д (`bottom: 8%`), дараа нь өөрийн өндрийн 12%-
-   иар доош — зургийн 88%-ийн шугам (замын дунд) дугуйтай таарна. */
-.ms-scene {
+/* ---------- 22a1. МОНГОЛ ТАЙЗ — бүтэн дэвсгэр ----------
+   `components/models/MongoliaScene.tsx`. Бүтэн хэсгийг бүрхэнэ; зам
+   нь зургийн доод ~20%-д тул зургийг доороо тулгаж, өндрийг нь
+   томсгоод замыг дугуйн түвшинд хүргэнэ. Дээд талын цайвар тэнгэр
+   дээр бараан бичвэр, доод талын бараан зам дээр цагаан удирдлага. */
+.ms-bg {
   position: absolute; inset: 0; z-index: 0;
-  display: flex; align-items: center; justify-content: center;
-  padding: clamp(14px, 2.6vh, 40px) clamp(14px, 2.4vw, 56px) clamp(4px, .8vh, 12px);
-  container-type: size;
-  pointer-events: none;
-  /* Тайзны дөрвөн ирмэгт цагаан руу уусна — хүрээтэй «зураг» биш */
-  -webkit-mask-image:
-    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
-    linear-gradient(180deg, transparent, #000 16%, #000 90%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
-    linear-gradient(180deg, transparent, #000 16%, #000 90%, transparent);
-  mask-composite: intersect;
+  overflow: hidden; pointer-events: none;
 }
-.ms-scene__art {
-  position: absolute; left: -30%; bottom: 8%;
-  width: 160%; aspect-ratio: 2400 / 1029;
-  transform: translateY(12%);
+.ms-bg__pic img { display: block; width: 100%; height: 100%; }
+/* `max-width: none` — глобал `picture { max-width: 100% }` нь 106%-ийг
+   хумиж, баруун захад цайвар зурвас үлдээж байв */
+.ms-bg__pic {
+  display: block; position: absolute; left: -3%; bottom: 0;
+  width: 106%; max-width: none; height: 134%;
 }
-.ms-scene__art picture, .ms-scene__art img { display: block; width: 100%; height: 100%; }
-.ms-scene__art img {
-  object-fit: cover;
-  /* зургийн дээд, доод ирмэг хуудасны цагаан руу уусна — хатуу шугам үлдэхгүй */
-  -webkit-mask-image: linear-gradient(180deg, transparent, #000 24%, #000 86%, transparent);
-  mask-image: linear-gradient(180deg, transparent, #000 24%, #000 86%, transparent);
+.ms-bg__pic img { object-fit: cover; object-position: 50% 100%; }
+/* дээд хэсэгт цэсний дор тэнгэр цайварлана — бичвэр уншигдана */
+.ms-bg::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,0) 32%);
 }
-/* Утас: 4:3 зохиомж, зам 71–100% → 84%-ийн шугам дугуйтай таарна.
-   Хайрцгаас 12.5%-иар хоёр тийш гарна. */
-.ms-scene__art--tall { display: none; }
 @media (max-width: 767px) {
-  /* Тайз өндөр болж, чимэглэл машины дээгүүр амьсгалтай харагдана;
-     ирмэгийн уусалт нимгэн — нарийн дэлгэцэнд өргөн уусалт бүхэл
-     зургийг бүдгэрүүлж байв. */
+  /* Машин тайзны доод хэсэгт, зам дээр сууна */
   .ms-stage { min-height: min(96vw, 440px); }
-  /* Машин тайзны доод хэсэгт сууна — дээрх зай бүхэлдээ уул, хот,
-     тэнгэрт; доороо хоосон зурвас үлдэхгүй. `.ms-scene` ижил
-     байрлалтай тул газрын шугам дугуйтай таарсаар. */
-  .ms-stage .ms-car, .ms-stage .ms-scene { align-items: flex-end; padding-bottom: clamp(18px, 6vw, 30px); }
-  .ms-scene {
-    -webkit-mask-image:
-      linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent),
-      linear-gradient(180deg, transparent, #000 8%, #000 94%, transparent);
-    mask-image:
-      linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent),
-      linear-gradient(180deg, transparent, #000 8%, #000 94%, transparent);
-  }
-  .ms-scene__art--wide { display: none; }
-  .ms-scene__art--tall {
-    display: block;
-    left: -12.5%; width: 125%;
-    aspect-ratio: 4 / 3;
-    transform: translateY(16%);
-  }
+  .ms-stage .ms-car { align-items: flex-end; padding-bottom: clamp(18px, 6vw, 30px); }
+  .ms-bg__pic { height: 100%; }
+  .ms-bg::after { background: linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,255,255,.2) 40%, rgba(255,255,255,0) 58%); }
 }
 
+
+/* Доод мөр бараан зам дээр — цагаан бичвэр */
+.ms-foot .ms-cta { color: #fff; }
+.ms-foot .ms-cta:hover { color: #fff; }
+.ms-foot .ms-cta::after { opacity: .45; }
+.ms-foot .ms-pick__name { color: rgba(255, 255, 255, .72); }
+.ms-foot .ms-pick__img { opacity: .55; }
+.ms-foot .ms-pick[aria-selected="true"] .ms-pick__name { color: #fff; }
+@media (hover: hover) {
+  .ms-foot .ms-pick:hover:not(:disabled) .ms-pick__name { color: #fff; }
+}
 
 /* ---------- 22c. МАШИН · ДУГУЙ · КУЗОВ ----------
    ⚠ ЭНЭ ХЭСЭГ НЬ БҮХ ХУУДАСНЫ ГОЛ САНАА.
