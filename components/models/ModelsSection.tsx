@@ -6,6 +6,7 @@ import Link from "next/link";
 import AnimatedArrowIcon from "./AnimatedArrowIcon";
 import ModelInfo from "./ModelInfo";
 import ModelSelector from "./ModelSelector";
+import MongoliaScene from "./MongoliaScene";
 import { showcaseModels, type ShowcaseModel } from "@/lib/models-showcase";
 import { WHEEL_ANCHORS } from "@/lib/wheel-anchors";
 import { track } from "@/lib/analytics";
@@ -78,6 +79,8 @@ const DURATION = 1500;
 const DURATION_SMALL = 1340;
 /** Дугуй биеэсээ хойш дуусна (ZA: 1.3s vs 1.2s) */
 const WHEEL_EXTRA = 100;
+/** Тайзны ойр давхаргын гулсалт, viewBox-ийн нэгжээр (1600 өргөнөөс). */
+const SCENE_SHIFT = 90;
 /* Хөдөлгөөн багасгасан үед: ХАСАХГҮЙ, БОГИНОСГОНО. Машин аль зүг рүү
    шилжсэн нь энэ хэсгийн АГУУЛГА мөн — бүдгэрэлтээр солих нь утгыг нь
    алдагдуулна. Зам бүтэн хэвээр, зөвхөн хурд буурна. */
@@ -279,6 +282,7 @@ export default function ModelsSection() {
 
   const sectionRef = useRef<HTMLElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
   const carRefs = useRef<(HTMLDivElement | null)[]>([]);
   const runningRef = useRef<Animation[]>([]);
   const activeRef = useRef(featuredIndex);
@@ -386,6 +390,19 @@ export default function ModelsSection() {
       ...wheelsOf(inEl),
       ...bodyOf(outEl, bodyOutKeyframes(nav.dir, lag)),
       ...bodyOf(inEl, bodyInKeyframes(nav.dir, lag)),
+      /* Тайзны давхаргууд машины чиглэлд depth-ээр жигнэсэн бага зэрэг
+         гулсана: ойр нь их, алс нь бага — «машинтай хамт ирэв». */
+      ...(reduce
+        ? []
+        : Array.from(sceneRef.current?.querySelectorAll<SVGGElement>("[data-depth]") ?? []).map(
+            (g) => {
+              const shift = nav.dir * SCENE_SHIFT * Number(g.dataset.depth ?? 0);
+              return g.animate(
+                [{ transform: `translate(${shift}px, 0)` }, { transform: "translate(0, 0)" }],
+                opts
+              );
+            }
+          )),
     ].filter((a): a is Animation => Boolean(a));
     runningRef.current = anims;
 
@@ -596,6 +613,13 @@ export default function ModelsSection() {
         >
           <Chevron d="M15 6l-6 6 6 6" />
         </button>
+
+        {/* Монгол тайз — машины ард, солих үед давхаргаараа гулсана */}
+        <div className="ms-scene" ref={sceneRef} aria-hidden>
+          <div className="ms-car__box ms-scene__box">
+            <MongoliaScene />
+          </div>
+        </div>
 
         <div className="ms-stage__track" ref={trackRef}>
           {models.map((m, i) => {

@@ -2790,7 +2790,42 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   user-select: none; -webkit-user-select: none;
 }
 
-.ms-stage__track { position: relative; height: 100%; overflow: hidden; }
+.ms-stage__track { position: relative; height: 100%; overflow: hidden; z-index: 1; }
+
+/* ---------- 22a1. МОНГОЛ ТАЙЗ ----------
+   `components/models/MongoliaScene.tsx`. `.ms-scene` нь `.ms-car`-тай
+   ИЖИЛ байрлал, padding, container-тай тул доторх `.ms-car__box` нь
+   машины хайрцагтай пиксел түвшинд давхцана. Чимэглэл нь хайрцгаас
+   30%-иар хоёр тийш гарч, газрын шугам (viewBox y=640) нь хайрцгийн
+   92%-д — дугуйн доор — сууна: `bottom: 8%` + өөрийн өндрийн
+   60/700-оор доош. */
+.ms-scene {
+  position: absolute; inset: 0; z-index: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: clamp(14px, 2.6vh, 40px) clamp(14px, 2.4vw, 56px) clamp(4px, .8vh, 12px);
+  container-type: size;
+  pointer-events: none;
+  /* Тайзны дөрвөн ирмэгт цагаан руу уусна — хүрээтэй «зураг» биш */
+  -webkit-mask-image:
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
+    linear-gradient(180deg, transparent, #000 16%, #000 90%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent),
+    linear-gradient(180deg, transparent, #000 16%, #000 90%, transparent);
+  mask-composite: intersect;
+}
+.ms-scene__art {
+  position: absolute; left: -30%; bottom: 8%;
+  width: 160%; height: auto; aspect-ratio: 1600 / 700;
+  transform: translateY(8.571%);
+  overflow: visible;
+}
+/* Утсан дээр хайрцаг нарийн тул тэнгэр, хот илүү харагдах хэрэгтэй */
+@media (max-width: 767px) {
+  .ms-scene__art { left: -45%; width: 190%; }
+}
+
 
 /* ---------- 22c. МАШИН · ДУГУЙ · КУЗОВ ----------
    ⚠ ЭНЭ ХЭСЭГ НЬ БҮХ ХУУДАСНЫ ГОЛ САНАА.
@@ -2860,6 +2895,14 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
     max-height: 100%;
   }
 }
+/* Desktop: машин тайзны ~74%-ийг эзэлнэ — ард нь Монгол тайз
+   (§22a1) харагдах амьсгал үлдэнэ. `.ms-scene__box` мөн энэ дүрмээр
+   хэмжигддэг тул газрын шугам дугуйтай таарсаар байна. */
+@supports (height: 1cqh) {
+  @media (min-width: 1000px) {
+    .ms-car__box { width: min(100%, calc(88cqh * var(--car-ar)), 74cqw); }
+  }
+}
 
 /* ⚠ `<picture>` нь inline элемент тул түүн доторх зургийн
    `height: 100%` шийдэгддэггүй байв — зураг ачаалагдаагүй үедээ
@@ -2898,7 +2941,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   display: grid; place-items: center;
   width: 46px; height: 46px; padding: 0;
   color: var(--c-ink);
-  background: transparent;
+  background: rgba(255, 255, 255, .72);  /* тайзны чимэглэл дээр уншигдана */
   border: 1px solid rgba(14, 14, 16, .14);
   border-radius: 50%;
   cursor: pointer;
