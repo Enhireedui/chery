@@ -254,9 +254,9 @@ export const footerLinks: NavItem[] = [
    зөв. Хоёр дараалал ЗОРИУД өөр. */
 export const slides: Slide[] = [
   { id: "tiggo-8", model: "Tiggo 8", line: "7 суудалтай гэр бүлийн SUV", img: "hero-t8", scene: "орчин үеийн байшингийн гадна" },
-  { id: "tiggo-7", model: "Tiggo 7", line: "Дэвшилтэт технологитой mid-size SUV", img: "hero-t7-ub", scene: "Улаанбаатар хотод, үдшийн бүрийд" },
+  { id: "tiggo-7", model: "Tiggo 7", line: "Дэвшилтэт технологитой mid-size SUV", img: "hero-t7-ub-v2", scene: "Улаанбаатар хотод, үдшийн бүрийд" },
   { id: "tiggo-4", model: "Tiggo 4", line: "Өдөр тутмын хэрэглээнд тохиромжтой", img: "hero-t4-terelj", scene: "Тэрэлжийн хөндийд, өглөөний нарны гэрэлд" },
-  { id: "tiggo-2", model: "Tiggo 2", line: "Хотын авсаархан SUV", img: "hero-t2-winter", scene: "өвлийн өглөө, цастай гудамжинд" },
+  { id: "tiggo-2", model: "Tiggo 2", line: "Хотын авсаархан SUV", img: "hero-t2-winter-v2", scene: "өвлийн өглөө, цастай гудамжинд" },
 ];
 
 /* ============================================================
