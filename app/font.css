@@ -1,0 +1,16 @@
+/* ══════════════════════════════════════════════════════════════
+   Фонтын холболт — `next/font`-ийн үүсгэсэн гэр бүлийг дизайны
+   системийн `--font` токенд холбоно.
+
+   ⚙ ЯАГААД Google Fonts-ийн <link>-ийг ХАССАН:
+   Өмнө `fonts.googleapis.com`-оос гадаад stylesheet ачаалж байсан
+   нь ХОЁР нэмэлт DNS+TLS холболт бөгөөд рендерийг хааж байв.
+   `next/font` нь фонтыг өөрөө host-лож, `font-display: swap`,
+   preload, ба зөв `size-adjust`-ыг өөрөө хийдэг тул layout shift
+   бага. Мөн CSP-ээс гадаад домэйн хасагдав (Phase 20).
+
+   ⚠ Импортын дараалал ЧУХАЛ: `site.css`-ийн ДАРАА байх ёстой,
+   эс тэгвээс `site.css`-ийн `--font` үүнийг дарна. */
+:root {
+  --font: var(--font-montserrat), -apple-system, "Segoe UI", system-ui, sans-serif;
+}

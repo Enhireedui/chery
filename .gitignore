@@ -1,0 +1,46 @@
+# ── Хамаарал, build гаралт ──
+node_modules/
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# ── Орчны хувьсагч — СЕКРЕТ. Хэзээ ч commit хийхгүй. ──
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# ── Vercel ──
+.vercel
+
+# ── Ажлын хавтаснууд (git-д ОРОХГҮЙ) ──
+# Эдгээр нь хайгуул, судалгаа, эх материалын хавтас. Дискэн дээр
+# лавлагаа болж үлдэнэ ч репод хэрэггүй:
+#   _crawl   — хуучин сайтаас татсан 406 МБ эх материал
+#   _build   — хуучин static generator ба түүний гаралт
+#   _research/_canvas/_theme — өрсөлдөгчийн судалгаа, зураг, WP theme
+_crawl/
+_build/
+_research/
+_canvas/
+_theme/
+_chery-za-assets/
+_shots/
+.claude/
+
+# ── OS / editor ──
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+
+# ── Түр файлууд ──
+*.log
+npm-debug.log*
+_*.html
