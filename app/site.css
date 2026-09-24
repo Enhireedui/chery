@@ -625,7 +625,6 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .nav__links a { font-weight: 500; letter-spacing: -.01em; } /* кирилл дээр сарниулахгүй */
 /* Цэс өргөссөн (дэд цэстэй 5 бүлэг) тул 1000–1439px-д утасны дугаар
    толгойноос нуугдана — хөл, холбоо барих хуудас, мобайл цэсэнд бий. */
-@media (min-width: 1000px) and (max-width: 1439.98px) { .nav__in .nav__phone { display: none; } }
 
 /* ---------- Дэд цэс (desktop) ----------
    Том mega-menu биш — нимгэн жагсаалт. `:hover` ба `:focus-within`
@@ -757,7 +756,22 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    Хэмжсэн (nowrap-тай): шаардлага 978px, контейнер 1012px
    → 34px нөөц. 1080px-д ердөө 16px байсан тул өөр системийн
    фонтын өргөний зөрүүг даахгүй — хязгаарыг дээшлүүлэв. */
-@media (min-width: 1100px) {
+/* 1000–1259px: дэд цэстэй 5 бүлэг багтахын тулд нягтруулна
+   (1024-д 18px халиж байсныг хэмжсэн). */
+@media (min-width: 1000px) and (max-width: 1259.98px) {
+  .nav__in { gap: var(--s-4); }
+  .nav__links { gap: 14px; }
+  .nav__links a { font-size: 14px; }
+  .nav__links .nav__item > a { gap: 4px; }
+}
+@media (min-width: 1000px) and (max-width: 1099.98px) {
+  .nav .nav__cta { min-width: 0; padding-inline: 16px; }
+  .nav .nav__cta svg { display: none; }
+}
+
+/* Цэс «Chery-ийн тухай», «Худалдан авалт»-аар өргөссөн тул дугаар
+   1440px-ээс л толгойд орно (1280-д 8px халиж байсныг хэмжсэн). */
+@media (min-width: 1440px) {
   .nav__in .nav__phone {
     display: inline-flex; margin-left: 0; font-size: 14px;
   }
@@ -970,6 +984,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    `center` бол энд БУРУУ — зохиомжийг эвдэнэ. */
 .hero--home .hero__slide img { object-fit: cover; object-position: 22% 54%; }
 .hero:not(.hero--home) .hero__slide img { object-fit: cover; object-position: 50% 50%; }
+/* Tiggo 4 (Тэрэлжийн кадар): машин зургийн 46–80%-д. 70% нь 768px-ийн
+   нарийн харьцаанд ч машиныг бүтнээр, зүүн талыг бичвэрт үлдээнэ. */
+.hero.hero--model .hero__slide[data-model="tiggo-4"] img { object-position: 70% 55%; }
 /* Tiggo 7 · 4 · 2-ын кадар (Улаанбаатар · Тэрэлж · өвлийн гудамж) нь
    машиныг АЛЬ ХЭДИЙН баруун тийш, зүүн талыг бичвэрт чөлөөтэй
    зурсан. 22% нь тэднийг баруун ирмэгээр тасалдаг тул хайчлалтыг
@@ -1695,27 +1712,27 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   /* Цэс энэ хуудсанд флоу дотор (тунгалаг биш) тул түүний өндрийг
      хасахгүй бол эхний дэлгэц цэсний өндрөөр хэтэрч, үнэ, товч
      нар нугалаанаас доош гардаг байв. */
-  .hero.hero--model .hero__stage { min-height: calc(100svh - var(--nav-h) - 1px); }
-  .hero.hero--model .hero__slide { position: absolute; inset: 0; }
-  /* Хевтээ 16:9 зураг босоо дэлгэцэнд `cover`-дэж өргөнийн
-     ердөө ~41% л харагдана. Тиймээс кадар тус бүрт төвийг
-     машины ӨМНӨД 3/4 (торон, гэрэл, өмнөд дугуй) руу шилжүүлэв —
-     эс тэгвээс зөвхөн хаалга, дугуй үзэгдэнэ.
-     Горим: 430×588 ба 390×844-д тооцсон дундаж. */
-  .hero.hero--model .hero__slide img { object-position: 50% 50%; }
-  .hero.hero--model .hero__slide[data-model="tiggo-2"] img { object-position: 75% 50%; }
-  .hero.hero--model .hero__slide[data-model="tiggo-4"] img { object-position: 42% 50%; }
-  .hero.hero--model .hero__slide[data-model="tiggo-7"] img { object-position: 35% 50%; }
-  .hero.hero--model .hero__slide[data-model="tiggo-8"] img { object-position: 75% 50%; }
+  /* M4: бичиг машиныг хаахгүйн тулд утсан дээр ДАВХАРЛАХГҮЙ — зураг
+     дээр (4:3 хүрээ, машин бүтнээр), бичвэр доор нь бараан дэвсгэр
+     дээр. Нийт өндөр нь нэг дэлгэцэд ойр, хэт өндөр hero үгүй. */
+  .hero.hero--model .hero__stage { min-height: 0; display: grid; background: #0b0c0f; }
+  .hero.hero--model .hero__slide { position: relative; inset: auto; aspect-ratio: 4 / 3; }
+  .hero.hero--model .hero__slide picture,
+  .hero.hero--model .hero__slide img { width: 100%; height: 100%; }
+  .hero.hero--model .hero__slide img { object-fit: cover; object-position: 50% 50%; }
+  .hero.hero--model .hero__slide[data-model="tiggo-2"] img { object-position: 64% 64%; } /* босоо кадар, сараалж бүтнээр */
+  .hero.hero--model .hero__slide[data-model="tiggo-4"] img { object-position: 50% 66%; } /* босоо кадар */
+  .hero.hero--model .hero__slide[data-model="tiggo-7"] img { object-position: 45% 50%; }
+  .hero.hero--model .hero__slide[data-model="tiggo-8"] img { object-position: 60% 50%; }
+  /* Зургийн доод ирмэг бичвэрийн дэвсгэр рүү уусна */
   .hero.hero--model .hero__scrim {
-    background:
-      linear-gradient(to top,
-        rgba(8,8,10,.93) 0%, rgba(8,8,10,.88) 14%, rgba(8,8,10,.72) 24%,
-        rgba(8,8,10,.42) 31%, rgba(8,8,10,.12) 36%, rgba(8,8,10,0) 40%),
-      linear-gradient(to bottom, rgba(8,8,10,.52) 0%, rgba(8,8,10,0) 16%);
+    inset: 0 0 auto 0; aspect-ratio: 4 / 3; height: auto;
+    background: linear-gradient(to top, #0b0c0f 0%, rgba(11,12,15,0) 22%);
   }
   .hero.hero--model .hero__body {
-    padding-bottom: calc(var(--s-4) + env(safe-area-inset-bottom, 0px));
+    position: static;
+    padding-top: var(--s-5);
+    padding-bottom: calc(var(--s-6) + env(safe-area-inset-bottom, 0px));
   }
   /* Хоёр товч НЭГ мөрөнд. Босоо байрлавал блок 112px
      уртасч, бичвэр машин руу дээш гарч түүнийг хаана. */

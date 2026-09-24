@@ -16,7 +16,8 @@ Status: ✅ fixed & verified · 🟡 open · ⏸ deferred (lower priority).
 | M1 | First screen lacked key specs and a clear next step; price styled inline | P1 | Hero held name + price + generic buttons only | Tagline, price block, verified key specs from `specs` (none for Tiggo 7), «Тест драйв захиалах» + «Үнийн санал авах» | 1280 / 1440 / 1920 and 390 screenshots | ✅ |
 | M2 | Test-drive CTA did not carry the model into the form | P1 | Plain `/contact#захиалга` link | `leadHref(purpose, model)`; form reads `?model=` / `?purpose=` | `/contact?model=tiggo-4&purpose=quote` → select = tiggo-4, purpose = quote | ✅ |
 | M3 | No persistent action on long mobile pages | P1 | — | Mobile action bar after the hero, hidden at the footer | 390 screenshot, bar shows mid-page | ✅ |
-| M4 | Tiggo 4 hero copy sits over the car grille at 1280–1440 | P1 | Source image has the car centred | Needs a right-weighted hero image (asset work) | Screenshot | 🟡 |
+| M4 | Tiggo 4 hero copy sits over the car grille at 1280–1440; on phones the copy covered the car on every model | P1 | Studio `t4-34` has the car centred; on phones the copy was overlaid on a full-height image | Existing asset `hero-t4-terelj-v2` (car right of centre, left third clear) + its tall variant; desktop `object-position: 70% 55%`. Phones: image in a 4:3 frame, copy below on a dark ground (no overlay), per-model crop | 1440/1280/768/430/390/360 before/after screenshots; copy/image overlap −24px (none) on all 4 models; CLS 0 | ✅ |
+| M6 | Header overflowed by 8–18px at 1000–1280 after the new menu items | P1 | Five groups + phone + CTA wider than the container | Phone from 1440px; tighter menu at 1000–1259; slimmer CTA at 1000–1099 | 10 routes × 9 widths: no horizontal overflow | ✅ |
 | M5 | Section heading repeats the bare model name (H2 «Tiggo 8») | P2 | Template | — | Heading outline | ⏸ |
 
 ## Contact / test-drive
