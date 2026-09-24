@@ -50,3 +50,12 @@ Status: ✅ fixed & verified · 🟡 open · ⏸ deferred (lower priority).
 Home, 4 model pages, contact, service × 1440/1280/1024/768/430/390/360 (49 combinations) + mobile menu:
 all 200, load at `scrollY 0`, no horizontal overflow, one H1, no heading skips, no text under 12px, menu never clipped, no console errors.
 Button heights normalised: 44px desktop, 48px touch (hero-header text CTA 40 → 44, mobile model hero 46 → 48).
+
+## Visual verification (M5, M7, N2, N3)
+
+Screenshots reviewed: Tiggo 4 section headings at 1440; spec row at 360/390/430; mobile menu closed/open at 390.
+- M5 ✅ «Гол шийдлүүд» and «Гадна ба дотоод орчин» render as section headings; the model name appears only in the hero.
+- M7 ✅ values `109 / 154 м.х` · `CVT / 6 DCT автомат` · `5` share one baseline at all three widths; labels below.
+- N2 ✅ label «Цэс хаах» when open, «Цэс нээх» after closing.
+- N3 ✅ backdrop dims the page to a mid grey (content recedes, still legible, menu stays the focus); wheel while open leaves scroll at 1200 (locked); backdrop tap closes; no horizontal overflow.
+
