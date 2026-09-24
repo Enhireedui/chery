@@ -19,6 +19,10 @@ function resolveSiteUrl(): string {
   const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
   if (explicit) return explicit.replace(/\/+$/, "");
 
+  /* Netlify: `URL` = сайтын үндсэн хаяг (build-time) */
+  const netlify = process.env.NETLIFY ? process.env.URL?.trim() : undefined;
+  if (netlify) return netlify.replace(/\/+$/, "");
+
   const prod = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
   if (prod) return `https://${prod.replace(/\/+$/, "")}`;
 
@@ -39,4 +43,6 @@ export function abs(path: string): string {
     Preview deployment-уудыг индекслүүлэхгүй — production-той
     давхардсан агуулга үүсгэхээс сэргийлнэ (Phase 15). */
 export const IS_PRODUCTION_HOST =
-  SITE_URL === "https://chery.mn" || process.env.VERCEL_ENV === "production";
+  SITE_URL === "https://chery.mn" ||
+  process.env.VERCEL_ENV === "production" ||
+  process.env.CONTEXT === "production"; /* Netlify production deploy */
