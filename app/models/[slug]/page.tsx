@@ -128,7 +128,10 @@ export default async function ModelPage({
                     )}
                   </p>
                   {keySpecs(m).length ? (
-                    <dl className="mh__specs">
+                    <dl
+                      className="mh__specs"
+                      style={{ "--n": keySpecs(m).length } as React.CSSProperties}
+                    >
                       {keySpecs(m).map(([k, v]) => (
                         <div key={k}>
                           <dt>{k}</dt>

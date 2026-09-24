@@ -1792,7 +1792,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .mh__all { display: inline-flex; margin-top: var(--s-4); color: rgba(255,255,255,.82); font-size: var(--fs-small); }
 .mh__all:hover { color: #fff; }
 @media (max-width: 767px) {
-  .mh__specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  /* 4 бол 2×2, 3 бол нэг мөрөнд 3 — хоосон нүд үлдэхгүй */
+  .mh__specs { grid-template-columns: repeat(min(var(--n, 2), 3), minmax(0, 1fr)); gap: var(--s-3) var(--s-4); }
+  .mh__specs[style*="--n: 4"], .mh__specs[style*="--n:4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mh__tagline, .mh__all { display: none; }
 }
 
