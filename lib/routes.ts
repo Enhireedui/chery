@@ -2,6 +2,16 @@
    `#захиалга` нь «Холбоо барих» хуудасны маягтын зангуу. */
 export const BOOK_HREF = "/contact#захиалга";
 
+/* Зорилго, загварыг урьдчилан сонгосон маягтын хаяг. Маягт нь
+   `?purpose=` ба `?model=`-ийг уншиж бөглөнө (`site.js` §12). */
+export type LeadPurpose = "test-drive" | "quote" | "advice";
+export function leadHref(purpose: LeadPurpose, model?: string): string {
+  const q = new URLSearchParams({ purpose, ...(model ? { model } : {}) });
+  return `/contact?${q.toString()}#захиалга`;
+}
+export const QUOTE_HREF = leadHref("quote");
+export const TEST_DRIVE_HREF = leadHref("test-drive");
+
 /* ══════════════════════════════════════════════════════════════
    НҮҮР ХУУДАСНЫ ОНЦЛОХ ЗАГВАР — ЦОРЫН ГАНЦ ЭХ СУРВАЛЖ.
 

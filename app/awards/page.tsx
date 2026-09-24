@@ -7,7 +7,7 @@ import Pic from "@/components/Pic";
 import { Arrow } from "@/components/blocks";
 import { awards, models } from "@/lib/content";
 import { awardsJsonLd } from "@/lib/jsonld";
-import { BOOK_HREF, modelHref } from "@/lib/routes";
+import { TEST_DRIVE_HREF, modelHref } from "@/lib/routes";
 
 /* ══════════════════════════════════════════════════════════════
    ШАГНАЛ, АМЖИЛТ — амьд сайтын `brand1` хуудасны залгамж.
@@ -296,7 +296,7 @@ export default function AwardsPage() {
           </div>
         </section>
 
-        <section className="section section--ink">
+        <section className="section section--ink" id="аюулгүй-байдал">
           <div className="container">
             <AwHead
               eyebrow="Аюулгүй байдал"
@@ -329,7 +329,7 @@ export default function AwardsPage() {
                 </p>
               </div>
               <div className="btn-row">
-                <a className="btn btn--primary" href={BOOK_HREF}>
+                <a className="btn btn--primary" href={TEST_DRIVE_HREF}>
                   Тест драйв захиалах
                 </a>
                 <a className="btn btn--secondary" href="/models">

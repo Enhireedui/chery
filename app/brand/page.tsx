@@ -62,7 +62,7 @@ export default function BrandPage() {
           </div>
         </section>
 
-        <section className="section section--tight">
+        <section className="section section--tight" id="дэлхийд">
           <div className="container">
             <div className="figures reveal">
               {brand.figures.map(([k, l]) => (

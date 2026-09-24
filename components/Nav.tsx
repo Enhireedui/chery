@@ -1,5 +1,5 @@
-import { site, nav } from "@/lib/content";
-import { BOOK_HREF } from "@/lib/routes";
+import { site, nav, type NavItem } from "@/lib/content";
+import { QUOTE_HREF } from "@/lib/routes";
 import { Arrow } from "@/components/blocks";
 
 /* ══════════════════════════════════════════════════════════════
@@ -37,6 +37,18 @@ const PhoneIcon = () => (
   </svg>
 );
 
+const Chevron = () => (
+  <svg className="nav__chev" width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+    <path d="M2.5 4.5 6 8l3.5-3.5" />
+  </svg>
+);
+
+/** Идэвхтэй эсэх: өөрөө эсвэл дэд холбоосын зам таарвал */
+const isActive = (n: NavItem, active: string) =>
+  !!active &&
+  (n.href.split(/[?#]/)[0] === active ||
+    (n.children ?? []).some((c) => c.href.split(/[?#]/)[0] === active));
+
 export default function Nav({
   active = "",
   hero = false,
@@ -65,12 +77,35 @@ export default function Nav({
           />
         </a>
 
+        {/* Дэд цэс JS-гүй: `:hover` ба `:focus-within`-ээр нээгдэнэ —
+            гарын Tab-аар эх холбоос руу, дараа нь дэд холбоосуудаар
+            дамжина. */}
         <nav className="nav__links" aria-label="Үндсэн цэс">
-          {nav.map((n) => (
-            <a key={n.href} href={n.href} aria-current={active === n.href ? "page" : undefined}>
-              {n.label}
-            </a>
-          ))}
+          {nav.map((n) =>
+            n.children ? (
+              <div className="nav__item" key={n.label}>
+                <a
+                  href={n.href}
+                  aria-haspopup="true"
+                  aria-current={isActive(n, active) ? "page" : undefined}
+                >
+                  {n.label}
+                  <Chevron />
+                </a>
+                <ul className="nav__sub" aria-label={n.label}>
+                  {n.children.map((c) => (
+                    <li key={c.href}>
+                      <a href={c.href}>{c.label}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <a key={n.href} href={n.href} aria-current={isActive(n, active) ? "page" : undefined}>
+                {n.label}
+              </a>
+            )
+          )}
         </nav>
 
         {/* Баруун талын бүлэг. Тусдаа хайрцаг болсон шалтгаан:
@@ -93,21 +128,21 @@ export default function Nav({
           <span className="num">{site.phone}</span>
         </a>
 
-        {/* Хөрвөлтийн ҮНДСЭН үйлдэл. «Тест драйв захиалах» нь
-            хэрэглэгчээс шууд амлалт нэхэж байсан — люкс брэнд эхний
-            алхамдаа тэгж асуудаггүй. «Мэдээлэл авах» нь босгыг
-            бууруулна, лид нь ижил маягтаар ирнэ.
+        {/* ⚙ «Мэдээлэл авах» → «Үнийн санал авах». Автомашин сонгож буй
+            хүний хамгийн түгээмэл дараагийн алхам бол үнэ; Tiggo 7-ийн
+            үнэ нээлттэй зарлагдаагүй тул энэ нь бодит хэрэгцээ. Тест
+            драйвын шууд амлалтаас босго нь бага, лид нь ижил маягтаар
+            (зорилго = «Үнийн санал») ирнэ.
 
             `data-modal-open`: нүүр хуудсанд модал нээгдэнэ (тэнд
-            `LeadModal` бий) бөгөөд харагдаж буй загварыг өөрөө
-            бөглөнө. Бусад хуудсанд модал БАЙХГҮЙ тул `site.js` нь
-            `preventDefault` хийхгүй — `href` хэвээр ажиллана. */}
+            `LeadModal` бий). Бусад хуудсанд модал БАЙХГҮЙ тул `href`
+            нь зорилгыг урьдчилан сонгосон маягт руу хөтөлнө. */}
         <a
           className="btn btn--primary nav__cta"
-          href={BOOK_HREF}
+          href={QUOTE_HREF}
           data-modal-open="lead-modal"
         >
-          Мэдээлэл авах
+          Үнийн санал авах
           <Arrow />
         </a>
 
@@ -129,17 +164,33 @@ export default function Nav({
             <a className="burger__phone" href={site.phoneHref}>
               {site.phone}
             </a>
-            {nav.map((n) => (
-              <a key={n.href} href={n.href}>
-                {n.label}
-              </a>
-            ))}
+            {nav.map((n) =>
+              n.children ? (
+                <details className="burger__group" key={n.label}>
+                  <summary>
+                    {n.label}
+                    <Chevron />
+                  </summary>
+                  <div className="burger__sub">
+                    {n.children.map((c) => (
+                      <a key={c.href} href={c.href}>
+                        {c.label}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              ) : (
+                <a key={n.href} href={n.href}>
+                  {n.label}
+                </a>
+              )
+            )}
             <a
               className="btn btn--primary"
-              href={BOOK_HREF}
+              href={QUOTE_HREF}
               data-modal-open="lead-modal"
             >
-              Мэдээлэл авах
+              Үнийн санал авах
             </a>
           </nav>
         </details>

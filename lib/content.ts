@@ -34,6 +34,8 @@ export interface Site {
 export interface NavItem {
   href: string;
   label: string;
+  /** Дэд цэс (desktop: dropdown, мобайл: accordion) */
+  children?: NavItem[];
 }
 
 /** Нүүрний hero-гийн кадр. `img` нь `/assets/img/{img}.avif|webp`. */
@@ -212,27 +214,73 @@ export const site: Site = {
    хэвээр үлдэж, хөлнөөс холбогдоно; бодит мэдээ 3 болмогц энд эргэж
    орно. Оронд нь «Шагнал» орлоо — брэндийн итгэл төрүүлэх хамгийн
    хүчтэй нотолгоо нь тэнд байна. */
+/* Худалдан авагчийн хэрэгцээгээр — дотоод агуулгын ангиллаар биш.
+   «Шагнал» тусдаа цэс байхаа больж «Chery-ийн тухай»-д орсон.
+   Дэд холбоос бүр ОДОО БАЙГАА агуулга руу заана — хоосон хуудас
+   үүсгээгүй. «Технологи» нь аюулгүй байдал, NCAP-ын хэсэг рүү
+   (тусдаа технологийн агуулга хараахан байхгүй). */
 export const nav: NavItem[] = [
   { label: "Загварууд", href: "/models" },
-  { label: "Брэнд", href: "/brand" },
-  { label: "Шагнал", href: "/awards" },
+  {
+    label: "Chery-ийн тухай",
+    href: "/brand",
+    children: [
+      { label: "Chery-ийн тухай", href: "/brand" },
+      { label: "Дэлхий дахинд", href: "/brand#дэлхийд" },
+      { label: "Технологи", href: "/awards#аюулгүй-байдал" },
+      { label: "Амжилт, шагнал", href: "/awards" },
+    ],
+  },
   { label: "Үйлчилгээ", href: "/service" },
+  {
+    label: "Худалдан авалт",
+    href: "/contact?purpose=quote#захиалга",
+    children: [
+      { label: "Үнийн санал авах", href: "/contact?purpose=quote#захиалга" },
+      { label: "Тест драйв захиалах", href: "/contact?purpose=test-drive#захиалга" },
+      { label: "Санхүүжилт", href: "/#нөхцөл" },
+    ],
+  },
   { label: "Холбоо барих", href: "/contact" },
 ];
 
-/* Хөлний нэмэлт холбоос — цэснээс гарсан ч оршин байгаа хуудсууд.
-
-   ⚠ ХОЁР ХОЛБООС ХАСАГДСАН:
-   · «Загвар харьцуулах» → `/compare` нь ХУУДАСГҮЙ (404). Хөлнөөс
-     эвдэрсэн холбоос заах нь итгэлийг шууд унагана. Хуудас
-     баригдмагц энэ мөрийг буцаана.
-   · «Мэдээ» → `/news` нь оршин байгаа ч `news` массив ХООСОН.
-     Хоосон хуудас руу урих нь хэрэглэгчийн цагийг үрнэ.
-     `news.length >= 3` болмогц буцаана — хуудас өөрөө хэвээр
-     тул хаяг нь ажилласаар байна. */
-export const footerLinks: NavItem[] = [
-  { label: "Шагнал, амжилт", href: "/awards" },
-  { label: "Түгээмэл асуулт", href: "/service#асуулт" },
+/* Хөлний бүлгүүд — худалдан авагчийн замаар. Холбоос бүр БАЙГАА
+   агуулга руу заана (сэлбэг, санхүүжилт — нүүрний «нөхцөл» хэсэг). */
+export const footerGroups: Array<{ title: string; links: NavItem[] }> = [
+  {
+    title: "Загварууд",
+    links: [
+      { label: "TIGGO 8", href: "/models/tiggo-8" },
+      { label: "TIGGO 7", href: "/models/tiggo-7" },
+      { label: "TIGGO 4", href: "/models/tiggo-4" },
+      { label: "TIGGO 2", href: "/models/tiggo-2" },
+    ],
+  },
+  {
+    title: "Худалдан авалт",
+    links: [
+      { label: "Үнийн санал", href: "/contact?purpose=quote#захиалга" },
+      { label: "Тест драйв", href: "/contact?purpose=test-drive#захиалга" },
+      { label: "Санхүүжилт", href: "/#нөхцөл" },
+    ],
+  },
+  {
+    title: "Эзэмшигчдэд",
+    links: [
+      { label: "Үйлчилгээ", href: "/service" },
+      { label: "Баталгаа", href: "/service#баталгаа" },
+      { label: "Сэлбэг", href: "/#нөхцөл" },
+      { label: "Түгээмэл асуулт", href: "/service#асуулт" },
+    ],
+  },
+  {
+    title: "Sain Motors · Chery",
+    links: [
+      { label: "Chery-ийн тухай", href: "/brand" },
+      { label: "Амжилт, шагнал", href: "/awards" },
+      { label: "Холбоо барих", href: "/contact" },
+    ],
+  },
 ];
 
 /* ============================================================
@@ -1074,3 +1122,26 @@ export const compareRows: CompareGroup[] = [
     { label: "Дугуй", pick: "Дугуй" },
   ]},
 ];
+
+/* ============================================================
+   ЗАГВАРЫН ГОЛ ҮЗҮҮЛЭЛТ — hero-гийн нэг мөр.
+   Зөвхөн `specs`-д БАЙГАА утгаас татна; олдохгүй бол мөр гарахгүй
+   (Tiggo 7-д үзүүлэлт баталгаажаагүй тул хоосон). Хоёр хувилбартай
+   загварт (Tiggo 4) «v1 / v2».
+   ============================================================ */
+const KEY_SPECS: Array<{ label: string; pick: string[] }> = [
+  { label: "Хөдөлгүүр", pick: ["Хөдөлгүүр"] },
+  { label: "Хүчин чадал, м.х", pick: ["Дээд хүчин чадал (морины хүч)", "Дээд хүчин чадал (м.х)"] },
+  { label: "Хурдны хайрцаг", pick: ["Хурдны хайрцаг"] },
+  { label: "Суудал", pick: ["Суудлын тоо"] },
+];
+export function keySpecs(m: Model): Array<[string, string]> {
+  if (!m.specs) return [];
+  const rows = m.specs.flatMap((g) => g.rows ?? []);
+  const out: Array<[string, string]> = [];
+  for (const k of KEY_SPECS) {
+    const r = rows.find((row) => k.pick.includes(row[0]));
+    if (r) out.push([k.label, r.slice(1).filter(Boolean).join(" / ")]);
+  }
+  return out;
+}

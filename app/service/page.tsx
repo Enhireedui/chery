@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import Pic from "@/components/Pic";
 import { Head, CtaSection } from "@/components/blocks";
 import { site, faq, testDrive } from "@/lib/content";
-import { BOOK_HREF } from "@/lib/routes";
+import { TEST_DRIVE_HREF } from "@/lib/routes";
 import { faqJsonLd } from "@/lib/jsonld";
 
 export const metadata: Metadata = {
@@ -25,7 +25,7 @@ export default function ServicePage() {
       />
       <Nav active="/service" />
       <main id="main">
-        <section className="section section--ink">
+        <section className="section section--ink" id="баталгаа">
           <div className="container">
             <div className="head reveal">
               <p className="meta">Албан ёсны үйлдвэрийн баталгаа</p>
@@ -88,8 +88,8 @@ export default function ServicePage() {
                 ))}
               </ul>
               <div className="btn-row">
-                <a className="btn btn--primary" href={BOOK_HREF}>
-                  Цаг захиалах
+                <a className="btn btn--primary" href={TEST_DRIVE_HREF}>
+                  Тест драйв захиалах
                 </a>
               </div>
             </div>

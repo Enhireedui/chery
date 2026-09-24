@@ -118,14 +118,14 @@
       if (detail) {
         if (id) detail.setAttribute("href", "/models/" + id);
         if (label) {
-          detail.setAttribute("aria-label", "CHERY " + label + " — үзүүлэлт, өнгө, үнэ");
+          detail.setAttribute("aria-label", "CHERY " + label + " — дэлгэрэнгүй үзэх");
         }
       }
       /* Анхдагч CTA нь ХАРАГДАЖ БУЙ загварыг нэрлэнэ. Харагдах
-         бичвэр («Мэдээлэл авах») хэвээр — зөвхөн дэлгэц уншигчид
+         бичвэр («Үнийн санал авах») хэвээр — зөвхөн дэлгэц уншигчид
          аль машины тухай мэдээлэл болохыг сонсоно. */
       if (lead && label) {
-        lead.setAttribute("aria-label", "CHERY " + label + " — мэдээлэл авах");
+        lead.setAttribute("aria-label", "CHERY " + label + " — үнийн санал авах");
       }
 
       /* Байрлалын тоолуур. Явцын зураасны урт нь `--p` custom
@@ -609,9 +609,77 @@
     server: "Илгээхэд алдаа гарлаа. Дахин оролдоно уу."
   };
 
+  /* Утас: «9911 2233» — 8 оронтой дотоод дугаарыг 4-4 бүлэглэнэ,
+     +976 угтвартай бол хэвээр үлдээнэ. */
+  function formatPhone(v) {
+    var plus = /^\s*\+/.test(v);
+    var d = v.replace(/\D/g, "");
+    if (plus || (d.length > 8 && d.indexOf("976") === 0)) {
+      var rest = d.replace(/^976/, "").slice(0, 8);
+      return "+976 " + (rest.length > 4 ? rest.slice(0, 4) + " " + rest.slice(4) : rest);
+    }
+    d = d.slice(0, 8);
+    return d.length > 4 ? d.slice(0, 4) + " " + d.slice(4) : d;
+  }
+  function phoneDigits(v) {
+    var d = v.replace(/\D/g, "");
+    return d.length > 8 && d.indexOf("976") === 0 ? d.slice(3) : d;
+  }
+
+  /* Талбарын алдааг ТУХАЙН талбарын доор харуулна */
+  function fieldError(input, text) {
+    var field = input.closest(".field");
+    if (!field) return;
+    var msg = field.querySelector(".field__err");
+    if (!text) {
+      field.classList.remove("field--error");
+      input.removeAttribute("aria-invalid");
+      if (msg) msg.remove();
+      return;
+    }
+    field.classList.add("field--error");
+    input.setAttribute("aria-invalid", "true");
+    if (!msg) {
+      msg = document.createElement("p");
+      msg.className = "field__err";
+      msg.id = (input.id || input.name) + "-err";
+      field.appendChild(msg);
+      input.setAttribute("aria-describedby", msg.id);
+    }
+    msg.textContent = text;
+  }
+
   function initLeadForms() {
     if (!window.fetch || !window.FormData) return;
+
+    /* Загвар, зорилгыг хаягаас урьдчилан сонгоно:
+       /contact?model=tiggo-8&purpose=test-drive#захиалга */
+    var params = new URLSearchParams(location.search);
+    var pModel = params.get("model"), pPurpose = params.get("purpose");
+
     document.querySelectorAll('form[action="/api/lead"]').forEach(function (form) {
+      var sel = form.querySelector('select[name="model"]');
+      if (sel && pModel && sel.querySelector('option[value="' + pModel + '"]')) sel.value = pModel;
+      if (pPurpose) {
+        var r = form.querySelector('input[name="purpose"][value="' + pPurpose + '"]');
+        if (r) r.checked = true;
+      }
+
+      var phone = form.querySelector('input[name="phone"]');
+      var name = form.querySelector('input[name="name"]');
+      if (phone) {
+        phone.addEventListener("input", function () {
+          var end = phone.selectionEnd === phone.value.length;
+          phone.value = formatPhone(phone.value);
+          if (end) phone.setSelectionRange(phone.value.length, phone.value.length);
+          if (phoneDigits(phone.value).length === 8) fieldError(phone, "");
+        });
+      }
+      if (name) name.addEventListener("input", function () { if (name.value.trim()) fieldError(name, ""); });
+      /* JS ажиллаж байвал хөтчийн bubble-ийн оронд талбарын доорх
+         алдаа; JS-гүй үед `required` хэвээр ажиллана. */
+      form.noValidate = true;
+
       var src = form.querySelector("[data-lead-source]");
       var btn = form.querySelector('button[type="submit"]');
       var label = btn ? btn.textContent : "";
@@ -624,10 +692,17 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (form.getAttribute("aria-busy") === "true") return;
+        var bad = null;
+        if (name && !name.value.trim()) { fieldError(name, "Нэрээ оруулна уу."); bad = bad || name; }
+        if (phone && phoneDigits(phone.value).length !== 8) {
+          fieldError(phone, "8 оронтой утасны дугаараа оруулна уу.");
+          bad = bad || phone;
+        }
+        if (bad) { bad.focus(); return; }
         if (src) src.value = location.pathname;
         form.setAttribute("aria-busy", "true");
         msg.hidden = true;
-        if (btn) { btn.disabled = true; btn.textContent = "Илгээж байна…"; }
+        if (btn) { btn.disabled = true; btn.classList.add("is-loading"); btn.textContent = "Илгээж байна…"; }
 
         fetch(form.action, {
           method: "POST",
@@ -641,8 +716,8 @@
               done.className = "form";
               done.setAttribute("role", "status");
               done.innerHTML =
-                '<p class="meta">Амжилттай</p><h3 class="h3">Хүсэлт хүлээн авлаа</h3>' +
-                '<p class="body">Ажлын цагаар тантай холбогдоно.</p>';
+                '<p class="meta">Амжилттай</p><h3 class="h3">Хүсэлт амжилттай илгээгдлээ</h3>' +
+                '<p class="body">Манай зөвлөх ажлын цагаар тантай холбогдох болно.</p>';
               form.replaceWith(done);
               return;
             }
@@ -655,14 +730,33 @@
           })
           .then(function () {
             form.removeAttribute("aria-busy");
-            if (btn) { btn.disabled = false; btn.textContent = label; }
+            if (btn) { btn.disabled = false; btn.classList.remove("is-loading"); btn.textContent = label; }
           });
       });
     });
   }
 
+  /* ---------- 13. МОБАЙЛ ҮЙЛДЛИЙН МӨР (загварын хуудас) ----------
+     Hero харагдаж байх үед нуугдана (тэнд товч бий), өнгөрмөгц
+     доороос гарч ирнэ. Хөлд хүрэхэд дахин нуугдана — хаягийг хаахгүй. */
+  function initMobileCta() {
+    var bar = document.querySelector("[data-mcta]");
+    var hero = document.querySelector(".hero--model");
+    var foot = document.querySelector(".foot");
+    if (!bar || !hero || !("IntersectionObserver" in window)) return;
+    var heroIn = true, footIn = false;
+    var paint = function () {
+      var on = !heroIn && !footIn;
+      bar.classList.toggle("is-on", on);
+      document.documentElement.classList.toggle("has-mcta", on);
+    };
+    new IntersectionObserver(function (e) { heroIn = e[0].isIntersecting; paint(); }).observe(hero);
+    if (foot) new IntersectionObserver(function (e) { footIn = e[0].isIntersecting; paint(); }).observe(foot);
+  }
+
   function ready() {
     document.documentElement.classList.remove("no-js");
+    initMobileCta();
     initLeadForms();
     var hero = document.querySelector(".hero");
     if (hero) initHero(hero);

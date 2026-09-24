@@ -81,8 +81,8 @@ export function ModelCard({ m }: { m: Model }) {
 export function BookingForm() {
   return (
     <form className="form reveal" method="post" action="/api/lead">
-      <p className="meta">Захиалга</p>
-      <h3 className="h3">Тест драйв захиалах</h3>
+      <p className="meta">Тест драйв · Үнийн санал</p>
+      <h3 className="h3">Хүсэлт илгээх</h3>
 
       <div className="field">
         <label htmlFor="f-name">Нэр</label>
@@ -90,7 +90,7 @@ export function BookingForm() {
       </div>
       <div className="field">
         <label htmlFor="f-phone">Утас</label>
-        <input id="f-phone" name="phone" type="tel" autoComplete="tel" required />
+        <input id="f-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="9911 2233" required />
       </div>
       <div className="field">
         <label htmlFor="f-email">

@@ -1,5 +1,5 @@
 ﻿import { slides } from "@/lib/content";
-import { BOOK_HREF, modelHref, FEATURED_MODEL_ID } from "@/lib/routes";
+import { QUOTE_HREF, modelHref, FEATURED_MODEL_ID } from "@/lib/routes";
 import { Arrow } from "@/components/blocks";
 
 /* Сонгогчийн хажуугийн заагчид. 16px — сумны жин нь тойргийн
@@ -190,20 +190,20 @@ export default function HomeHero() {
               <div className="hero__actions">
                 <a
                   className="btn btn--primary btn--lg btn--hero"
-                  href={BOOK_HREF}
+                  href={QUOTE_HREF}
                   data-modal-open="lead-modal"
                   data-hero-lead
-                  aria-label={`CHERY ${first.model} — мэдээлэл авах`}
+                  aria-label={`CHERY ${first.model} — үнийн санал авах`}
                 >
-                  Мэдээлэл авах
+                  Үнийн санал авах
                 </a>
                 <a
                   className="btn btn--onphoto btn--hero"
                   data-hero-detail
                   href={modelHref(first.id)}
-                  aria-label={`CHERY ${first.model} — үзүүлэлт, өнгө, үнэ`}
+                  aria-label={`CHERY ${first.model} — дэлгэрэнгүй үзэх`}
                 >
-                  Үзүүлэлт үзэх
+                  Дэлгэрэнгүй үзэх
                   <Arrow />
                 </a>
               </div>

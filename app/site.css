@@ -358,7 +358,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 }
 .nav__links a[aria-current="page"] { border-color: var(--c-accent); }
 .nav__phone {
-  margin-left: auto;
+  margin-left: auto; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 7px; min-height: 44px;
   font-weight: 600; font-size: var(--fs-small);
   font-variant-numeric: tabular-nums;
@@ -623,6 +623,67 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    §3: цэс нь hero-г дарж болохгүй. Шошго нь жижиг, үсэг хоорондын
    зай нь илүү — хэмжээгээрээ биш, зайгаараа анхаарал татна. */
 .nav__links a { font-weight: 500; letter-spacing: -.01em; } /* кирилл дээр сарниулахгүй */
+/* Цэс өргөссөн (дэд цэстэй 5 бүлэг) тул 1000–1439px-д утасны дугаар
+   толгойноос нуугдана — хөл, холбоо барих хуудас, мобайл цэсэнд бий. */
+@media (min-width: 1000px) and (max-width: 1439.98px) { .nav__in .nav__phone { display: none; } }
+
+/* ---------- Дэд цэс (desktop) ----------
+   Том mega-menu биш — нимгэн жагсаалт. `:hover` ба `:focus-within`
+   (гарын Tab) хоёуланд нээгдэнэ, JS хэрэггүй. Бага зэрэг бүдгэрч
+   доошоо гулсана; reduced-motion үед шууд. */
+.nav__item { position: relative; display: inline-flex; }
+.nav__links .nav__item > a { gap: 6px; }
+.nav__chev { flex: 0 0 auto; opacity: .7; transition: transform 200ms var(--ease); }
+.nav__sub {
+  position: absolute; left: -18px; top: 100%;
+  min-width: 232px; margin: 0; padding: 10px 0;
+  list-style: none;
+  background: var(--c-paper);
+  border: 1px solid var(--c-line);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, .10);
+  opacity: 0; visibility: hidden; transform: translateY(6px);
+  transition: opacity 180ms var(--ease), transform 180ms var(--ease), visibility 0s linear 180ms;
+  z-index: 60;
+}
+.nav__links .nav__sub a {
+  display: flex; min-height: 42px; padding: 0 18px;
+  color: var(--c-muted); border: 0;
+  font-size: 15px; font-weight: 500; letter-spacing: -.01em;
+}
+.nav__links .nav__sub a:hover,
+.nav__links .nav__sub a:focus-visible { color: var(--c-ink); background: var(--c-surface); }
+/* Hero дээрх бараан толгойд — бараан дэд цэс */
+.nav--hero .nav__sub { background: #121418; border-color: rgba(255, 255, 255, .08); box-shadow: 0 18px 40px rgba(0, 0, 0, .3); }
+.nav--hero .nav__links .nav__sub a { color: rgba(255, 255, 255, .74); }
+.nav--hero .nav__links .nav__sub a:hover,
+.nav--hero .nav__links .nav__sub a:focus-visible { color: #fff; background: rgba(255, 255, 255, .06); }
+.nav__item:hover .nav__sub,
+.nav__item:focus-within .nav__sub {
+  opacity: 1; visibility: visible; transform: none;
+  transition: opacity 180ms var(--ease), transform 180ms var(--ease), visibility 0s;
+}
+.nav__item:hover .nav__chev,
+.nav__item:focus-within .nav__chev { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) {
+  .nav__sub, .nav__chev { transition: none; }
+}
+
+/* ---------- Дэд цэс (мобайл) — accordion ---------- */
+.burger__group > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  min-height: 48px;
+  font-size: 1.0625rem; font-weight: 500; color: var(--c-ink);
+  border-bottom: 1px solid var(--c-line);
+}
+.burger__group > summary::-webkit-details-marker { display: none; }
+.burger__group[open] > summary .nav__chev { transform: rotate(180deg); }
+.burger__sub { display: grid; padding: 4px 0 8px 14px; border-bottom: 1px solid var(--c-line); }
+.burger__panel .burger__sub a {
+  min-height: 44px; font-size: 1rem; font-weight: 400;
+  color: var(--c-muted); border-bottom: 0;
+}
 
 /* CTA — «том улаан тэгш өнцөгт» биш. 224×54 (≥1260px) нь §3-ын
    220–260 × 52–58 хүрээнд. Hover дээр 2px өргөгдөнө, сүүдэр нэмэхгүй.
@@ -1668,6 +1729,56 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .hero .btn--secondary:hover { background: #fff; color: var(--c-ink); border-color: #fff; }
 .hero__copy .meta { color: rgba(255,255,255,.82); }
 
+/* ---------- 7г. МОБАЙЛ ҮЙЛДЛИЙН МӨР (загварын хуудас) ---------- */
+.mcta { display: none; }
+@media (max-width: 767px) {
+  .mcta {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, .96);
+    border-top: 1px solid var(--c-line);
+    transform: translateY(110%); transition: transform 260ms var(--ease);
+  }
+  .mcta.is-on { transform: none; }
+  .mcta .btn { min-height: 48px; width: 100%; padding-inline: 12px; }
+  /* «Дээш буцах» товч мөрний дээгүүр гарна */
+  .has-mcta .to-top { bottom: 84px; }
+}
+@media (max-width: 767px) and (prefers-reduced-motion: reduce) { .mcta { transition: none; } }
+
+/* ---------- 7в. ЗАГВАРЫН ХУУДАСНЫ HERO — эхний дэлгэц ----------
+   Загвар · байр суурь · үнэ · гол үзүүлэлт · дараагийн алхам.
+   Inline style-ууд класс болсон; нэр нь Manrope (--font-display). */
+.hero .hero__copy.mh { max-width: 620px; }
+.mh__name {
+  margin: 6px 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 4.4vw, 4.25rem);
+  font-weight: 600; letter-spacing: -.035em; line-height: .98;
+  color: #fff;
+}
+.mh__tagline { margin: 10px 0 0; font-size: clamp(1rem, 1.3vw, 1.125rem); color: rgba(255,255,255,.82); letter-spacing: -.01em; }
+.mh__price { margin: var(--s-5) 0 0; display: grid; gap: 4px; }
+.mh__amount { font-size: clamp(1.125rem, 1.5vw, 1.375rem); font-weight: 600; letter-spacing: -.015em; font-variant-numeric: tabular-nums; color: #fff; }
+.mh__amount--ask { font-size: 1rem; font-weight: 500; }
+.mh__note { font-size: 13px; color: rgba(255,255,255,.62); }
+.mh__specs {
+  margin: var(--s-5) 0 0; padding-top: var(--s-4);
+  border-top: 1px solid rgba(255,255,255,.22);
+  display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: var(--s-3) var(--s-6);
+}
+.mh__specs div { display: grid; gap: 2px; }
+.mh__specs dt { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.6); }
+.mh__specs dd { margin: 0; font-size: 15px; font-weight: 600; color: #fff; letter-spacing: -.01em; }
+.mh .btn-row { margin-top: var(--s-6); }
+.mh__all { display: inline-flex; margin-top: var(--s-4); color: rgba(255,255,255,.82); font-size: var(--fs-small); }
+.mh__all:hover { color: #fff; }
+@media (max-width: 767px) {
+  .mh__specs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mh__tagline, .mh__all { display: none; }
+}
+
 /* ---------- 8. ЗАГВАРЫН КАРТ ---------- */
 .card {
   display: flex; flex-direction: column;
@@ -1830,20 +1941,25 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 
 /* ---------- 14. МАЯГТ ---------- */
 .form { display: grid; gap: var(--s-4); align-content: start; }
-.field { display: grid; gap: 6px; }
-.field label { font-size: var(--fs-small); font-weight: 600; }
+.field { display: grid; gap: 8px; }
+.field label { font-size: var(--fs-small); font-weight: 600; letter-spacing: -.005em; }
 .field label span { font-weight: 400; color: var(--c-muted); }
 .form input[type="text"], .form input[type="tel"], .form input[type="email"], .form select, .form textarea {
   font: inherit; font-size: 1rem; color: var(--c-ink); background: var(--c-paper);
   border: 1px solid var(--c-line); border-radius: var(--radius-sm);
-  padding: 0 14px; min-height: 48px; width: 100%;
-  transition: border-color 200ms ease;
+  padding: 0 16px; min-height: 52px; width: 100%;
+  transition: border-color 200ms ease, box-shadow 200ms ease;
 }
 .form textarea { padding-block: 12px; min-height: 120px; line-height: 1.6; }
 .form ::placeholder { color: var(--c-muted); opacity: 1; }
 .form :is(input, select, textarea):focus { border-color: var(--c-ink); outline: none; }
 .form :is(input, select, textarea):focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 .form :is(input, textarea):user-invalid { border-color: var(--c-accent); }
+/* Талбарын алдаа — талбарын доор, товч тодорхой (`site.js` §12) */
+.field--error :is(input, select) { border-color: var(--c-accent); }
+.field__err { margin: 2px 0 0; font-size: 13px; line-height: 1.4; color: #b8121b; } /* 4.5:1+ цагаан дээр */
+/* Илгээж байх үед — товч бүдгэрч, дахин дарагдахгүй */
+.btn.is-loading { opacity: .7; cursor: progress; }
 .fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 6px; }
 .fieldset legend { font-size: var(--fs-small); font-weight: 600; padding: 0; }
 .radios { display: flex; flex-wrap: wrap; gap: 0 var(--s-4); }
@@ -1852,7 +1968,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .form .btn { justify-self: start; }
 @media (max-width: 599px) { .form .btn { justify-self: stretch; } }
 
-/* ---------- 14б. МЭДЭЭЛЭЛ АВАХ МОДАЛ ----------
+/* ---------- 14б. ҮНИЙН САНАЛ АВАХ МОДАЛ ----------
    Native `<dialog>`. Хөтөч өгдөг зүйлийг гараар бичихгүй:
    Esc-ээр хаах · фокусын урхи · дэвсгэрийг inert болгох ·
    хаагдахад фокусыг нээсэн товч руу эргүүлэх.
@@ -1942,8 +2058,23 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 /* ---------- 17. ХӨЛ ---------- */
 .foot { background: var(--c-ink); color: rgba(255,255,255,.72); padding-block: var(--s-9) var(--s-7); font-size: var(--fs-small); }
 .foot__in { width: var(--container); margin-inline: auto; display: grid; gap: var(--s-7); }
-@media (min-width: 800px) { .foot__in { grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: var(--s-7); } }
-@media (min-width: 800px) and (max-width: 1039px) { .foot__in { grid-template-columns: repeat(2, 1fr); } }
+/* Дээд мөр: брэнд + 4 бүлэг; доод мөр: шоурум, цаг */
+.foot__top { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s-7) var(--s-6); }
+.foot__brand { grid-column: 1 / -1; }
+.foot__brand p { margin: var(--s-5) 0 0; max-width: 38ch; }
+.foot__meta {
+  margin-top: var(--s-8); padding-top: var(--s-7);
+  border-top: 1px solid rgba(255,255,255,.14);
+}
+@media (min-width: 800px) {
+  .foot__meta { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1040px) {
+  .foot__top { grid-template-columns: 1.6fr repeat(4, minmax(0, 1fr)); }
+  .foot__brand { grid-column: auto; }
+  .foot__meta { grid-template-columns: 1.6fr 2fr 2fr; }
+  .foot__meta > div:first-child { grid-column: 2; }
+}
 .foot strong { display: block; color: #fff; font-weight: 600; margin-bottom: var(--s-3); }
 .foot a { color: #fff; text-decoration: none; display: inline-flex; align-items: center; min-height: 40px; }
 .foot a:hover { color: var(--c-accent); }

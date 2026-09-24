@@ -58,7 +58,7 @@ export default function LeadModal() {
               үүсгэж байв. Харагдац хэвээр — хэмжээг `.h3` анги
               хэлнэ, шошгыг таг хэлнэ. */}
           <h2 className="h3" id="lead-title">
-            Мэдээлэл авах
+            Үнийн санал авах
           </h2>
           <p className="body body--lead">
             Нэр, утсаа үлдээгээрэй. Ажлын цагаар холбогдож үнэ, хувилбар,
@@ -99,7 +99,7 @@ export default function LeadModal() {
             style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }}
           />
 
-          <input type="hidden" name="purpose" value="advice" />
+          <input type="hidden" name="purpose" value="quote" />
           <input type="hidden" name="model" data-lead-model value="" />
           <input type="hidden" name="source_path" data-lead-source value="" />
 

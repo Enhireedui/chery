@@ -1,4 +1,4 @@
-import { site, footerLinks } from "@/lib/content";
+import { site, footerGroups } from "@/lib/content";
 import BrandReveal from "@/components/BrandReveal";
 
 /* Хөл — SERVER COMPONENT. Он нь build-time дээр тогтоно
@@ -8,8 +8,9 @@ import BrandReveal from "@/components/BrandReveal";
 export default function Footer() {
   return (
     <footer className="foot">
-      <div className="foot__in">
-        <div>
+      {/* Дээд мөр: брэнд + дөрвөн бүлэг холбоос (худалдан авагчийн зам) */}
+      <div className="foot__in foot__top">
+        <div className="foot__brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/img/logo-chery-white.webp"
@@ -18,11 +19,26 @@ export default function Footer() {
             height={66}
             style={{ height: "22px", width: "auto", opacity: 0.9 }}
           />
-          <p style={{ margin: "var(--s-5) 0 0", maxWidth: "38ch" }}>
+          <p>
             {site.role} — {site.legal}.
           </p>
         </div>
+        {footerGroups.map((g) => (
+          <nav key={g.title} aria-label={g.title}>
+            <strong>{g.title}</strong>
+            <ul className="foot__links">
+              {g.links.map((l) => (
+                <li key={l.href + l.label}>
+                  <a href={l.href}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+      </div>
 
+      {/* Доод мөр: шоурум, цаг, хууль зүйн мэдээлэл */}
+      <div className="foot__in foot__meta">
         <div>
           <strong>Шоурум</strong>
           {site.address.line1}
@@ -31,7 +47,6 @@ export default function Footer() {
           <br />
           <a href={site.phoneHref}>{site.phone}</a>
         </div>
-
         <div>
           <strong>Цагийн хуваарь</strong>
           <ul className="foot__hours">
@@ -39,17 +54,6 @@ export default function Footer() {
               <li key={d}>
                 <span>{d}</span>
                 <span>{t}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <strong>Хэрэгсэл</strong>
-          <ul className="foot__links">
-            {footerLinks.map((l) => (
-              <li key={l.href}>
-                <a href={l.href}>{l.label}</a>
               </li>
             ))}
           </ul>

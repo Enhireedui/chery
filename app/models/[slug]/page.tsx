@@ -5,9 +5,9 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Pic from "@/components/Pic";
 import { Arrow, Head, CtaSection } from "@/components/blocks";
-import { site, models, awards, type Model } from "@/lib/content";
+import { site, models, awards, keySpecs, type Model } from "@/lib/content";
 import { mnt } from "@/lib/format";
-import { BOOK_HREF } from "@/lib/routes";
+import { leadHref } from "@/lib/routes";
 import { carJsonLd } from "@/lib/jsonld";
 
 /* ══════════════════════════════════════════════════════════════
@@ -37,12 +37,15 @@ export async function generateMetadata({
   const { slug } = await params;
   const m = find(slug);
   if (!m) return {};
+  /* «Chery Tiggo 8 Монгол | Үнэ, үзүүлэлт | Sain Motors» — хайлтад
+     хүмүүсийн бичдэг үгсээр; layout-ийн загварыг дарна (`absolute`). */
+  const title = `Chery ${m.name} Монгол | Үнэ, үзүүлэлт | Sain Motors`;
   return {
-    title: `CHERY ${m.name} — ${m.tagline}`,
+    title: { absolute: title },
     description: `CHERY ${m.name}. ${m.lede}`,
     alternates: { canonical: `/models/${m.id}` },
     openGraph: {
-      title: `CHERY ${m.name} — ${m.tagline}`,
+      title,
       description: m.lede,
       url: `/models/${m.id}`,
     },
@@ -105,47 +108,46 @@ export default async function ModelPage({
             <div className="hero__scrim" />
             <div className="hero__body">
               <div className="container">
-                <div className="hero__copy" style={{ maxWidth: "34ch" }}>
+                {/* Эхний дэлгэцэд: загвар · байр суурь · үнэ · гол үзүүлэлт ·
+                    дараагийн алхам. Анхдагч НЭГ (улаан), хоёрдогч нэг. */}
+                <div className="hero__copy mh">
                   <p className="meta">{m.segment}</p>
-                  <h1 className="display" style={{ fontSize: "var(--fs-h1)" }}>
-                    {m.name}
-                  </h1>
-                  <p
-                    style={{
-                      margin: 0,
-                      fontWeight: 600,
-                      fontVariantNumeric: "tabular-nums",
-                    }}
-                  >
+                  <h1 className="mh__name">{m.name}</h1>
+                  <p className="mh__tagline">{m.tagline}</p>
+                  <p className="mh__price">
                     {m.price ? (
                       <>
-                        {mnt(m.price.from)}-аас
-                        {m.price.to ? ` · ${mnt(m.price.to)} хүртэл` : ""}
-                        <span
-                          style={{
-                            display: "block",
-                            fontSize: "var(--fs-meta)",
-                            letterSpacing: ".1em",
-                            textTransform: "uppercase",
-                            color: "rgba(255,255,255,.6)",
-                            marginTop: 6,
-                          }}
-                        >
-                          {m.price.note}
+                        <span className="mh__amount">
+                          {mnt(m.price.from)}-аас
+                          {m.price.to ? ` · ${mnt(m.price.to)} хүртэл` : ""}
                         </span>
+                        <span className="mh__note">{m.price.note}</span>
                       </>
                     ) : (
-                      m.priceNote
+                      <span className="mh__amount mh__amount--ask">{m.priceNote}</span>
                     )}
                   </p>
+                  {keySpecs(m).length ? (
+                    <dl className="mh__specs">
+                      {keySpecs(m).map(([k, v]) => (
+                        <div key={k}>
+                          <dt>{k}</dt>
+                          <dd>{v}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  ) : null}
                   <div className="btn-row">
-                    <a className="btn btn--primary" href={BOOK_HREF}>
+                    <a className="btn btn--primary" href={leadHref("test-drive", m.id)}>
                       Тест драйв захиалах
                     </a>
-                    <a className="btn btn--secondary" href="#үзүүлэлт">
-                      Үзүүлэлт
+                    <a className="btn btn--secondary" href={leadHref("quote", m.id)}>
+                      Үнийн санал авах
                     </a>
                   </div>
+                  <a className="link mh__all" href="#үзүүлэлт">
+                    Бүх үзүүлэлт <Arrow />
+                  </a>
                 </div>
               </div>
             </div>
@@ -434,8 +436,8 @@ export default async function ModelPage({
                 <Head eyebrow="Үзүүлэлт" title="Баталгаажуулж байна" />
                 <p className="note">{m.specsNote}</p>
                 <div className="btn-row" style={{ marginTop: "var(--s-6)" }}>
-                  <a className="btn btn--secondary" href={BOOK_HREF}>
-                    Үнийн мэдээлэл авах
+                  <a className="btn btn--secondary" href={leadHref("quote", m.id)}>
+                    Үнийн санал авах
                   </a>
                   <a className="btn btn--secondary" href={site.phoneHref}>
                     {site.phone}
@@ -468,6 +470,16 @@ export default async function ModelPage({
 
         <CtaSection />
       </main>
+      {/* Мобайл: hero-г өнгөрмөгц доод талд хоёр үйлдэл (`site.js` §13).
+          Hero дотор аль хэдийн товч байгаа тул тэнд харагдахгүй. */}
+      <div className="mcta" data-mcta aria-label={`CHERY ${m.name} — үйлдэл`} role="region">
+        <a className="btn btn--secondary" href={leadHref("quote", m.id)}>
+          Үнийн санал
+        </a>
+        <a className="btn btn--primary" href={leadHref("test-drive", m.id)}>
+          Тест драйв
+        </a>
+      </div>
       <Footer />
     </>
   );

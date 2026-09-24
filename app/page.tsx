@@ -76,7 +76,7 @@ export default function HomePage() {
             ⚠ `k` нь « / »-ээр залгасан хос утга («3 жил /
             100,000 км»). Хоёр мөр болгож задлав: нэг мөрөнд
             шахагдсан налуу зураас нь тоог уншихад саад болдог. */}
-        <section className="section section--tight hp-facts">
+        <section className="section section--tight hp-facts" id="нөхцөл">
           <div className="container">
             <div className="hp-facts__head">
               <p className="meta">Худалдан авалтын дараа</p>
