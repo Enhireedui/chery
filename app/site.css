@@ -767,6 +767,17 @@ html.menu-open { overflow: hidden; }
    Хэмжсэн (nowrap-тай): шаардлага 978px, контейнер 1012px
    → 34px нөөц. 1080px-д ердөө 16px байсан тул өөр системийн
    фонтын өргөний зөрүүг даахгүй — хязгаарыг дээшлүүлэв. */
+/* Hero дээрх тунгалаг толгой 1000–1199px-д: лого, цэс, CTA хоорондоо
+   наалдаж байсан (1024-д хэмжсэн). */
+@media (min-width: 1000px) and (max-width: 1199.98px) {
+  .nav--hero .nav__in { gap: var(--s-5); }
+  .nav--hero .nav__links { gap: 14px; }
+  .nav--hero .nav__links a { font-size: 13.5px; }
+  .nav.nav--hero .nav__cta { font-size: 13.5px; }
+  .nav--hero .nav__brand img { height: 19px; }
+  .nav--hero .nav__brand .nav__chery { height: 12px; }
+}
+
 /* 1000–1259px: дэд цэстэй 5 бүлэг багтахын тулд нягтруулна
    (1024-д 18px халиж байсныг хэмжсэн). */
 @media (min-width: 1000px) and (max-width: 1259.98px) {
@@ -1539,6 +1550,14 @@ html.menu-open { overflow: hidden; }
   /* Tiggo 7-гийн кадарт машин бусдаасаа ДООГУУР (зургийн 61%-д
      төвтэй) тул ~30px дээшлүүлэв. */
   .hero--home .hero__slide[data-model="tiggo-7"] img { object-position: 50% 76%; }
+  /* Бичвэр машины бамперт давхцахгүй: кадрыг ~8% дээш өргөнө (дээд
+     тэнгэрээс тайрна) — машин нь нарийн дэлгэцэнд ч гарчгийн дээр. */
+  .hero--home .hero__slide picture {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 108%;
+  }
+  /* CTA ба «Дэлгэрэнгүй» нэг мөрөнд — блок намсч, гарчиг доош суух зай */
+  .hero--home .hero__actions { flex-wrap: nowrap !important; gap: var(--s-5) !important; }
+  .hero--home .btn--primary.btn--hero { min-width: 0 !important; flex: 0 0 auto !important; padding-inline: 22px !important; }
 
   /* Зөвхөн ДООД налуу — бичвэрийн ард. Дээд ирмэг нь тунгалаг цэсэнд.
 

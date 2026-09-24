@@ -126,14 +126,14 @@ export default function HomePage() {
                   />
                 </span>
                 <span className="hp-gate__body">
-                  <span className="meta">Брэнд</span>
+                  <span className="meta">Chery-ийн тухай</span>
                   <span className="h3">22 жил дараалан экспортын тэргүүлэгч</span>
                   <span className="body">
                     120 гаруй орон, бүс нутагт борлуулагддаг. 2025 оны Fortune Global 500
                     жагсаалтад #223.
                   </span>
                   <span className="link">
-                    Брэндтэй танилцах <Arrow />
+                    Дэлгэрэнгүй <Arrow />
                   </span>
                 </span>
               </a>
@@ -147,14 +147,14 @@ export default function HomePage() {
                   />
                 </span>
                 <span className="hp-gate__body">
-                  <span className="meta">Эзэмшил</span>
+                  <span className="meta">Эзэмшигчдэд</span>
                   <span className="h3">Албан ёсны сервис ба баталгаа</span>
                   <span className="body">
                     Баталгаат засвар юуг хамардаг, сэлбэг хэрхэн бэлэн байдаг, лизингийн
                     нөхцөл ямар вэ.
                   </span>
                   <span className="link">
-                    Нөхцөлтэй танилцах <Arrow />
+                    Үйлчилгээ, баталгаа <Arrow />
                   </span>
                 </span>
               </a>

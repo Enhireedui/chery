@@ -302,7 +302,7 @@ export const footerGroups: Array<{ title: string; links: NavItem[] }> = [
    зөв. Хоёр дараалал ЗОРИУД өөр. */
 export const slides: Slide[] = [
   { id: "tiggo-8", model: "Tiggo 8", line: "7 суудалтай гэр бүлийн SUV", img: "hero-t8-steppe", scene: "Монголын тал нутгийн зам дээр, нар жаргах үед" },
-  { id: "tiggo-7", model: "Tiggo 7", line: "Дэвшилтэт технологитой mid-size SUV", img: "hero-t7-ub-v7", scene: "Улаанбаатар хотод, үдшийн бүрийд" },
+  { id: "tiggo-7", model: "Tiggo 7", line: "Дэвшилтэт технологитой дунд оврын SUV", img: "hero-t7-ub-v7", scene: "Улаанбаатар хотод, үдшийн бүрийд" },
   { id: "tiggo-4", model: "Tiggo 4", line: "Өдөр тутмын хэрэглээнд тохиромжтой", img: "hero-t4-terelj-v2", scene: "Тэрэлжийн хөндийд, өглөөний нарны гэрэлд" },
   { id: "tiggo-2", model: "Tiggo 2", line: "Хотын авсаархан SUV", img: "hero-t2-winter-v13", scene: "өвлийн өглөө, цастай гудамжинд" },
 ];
