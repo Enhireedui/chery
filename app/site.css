@@ -52,7 +52,7 @@
   --mist-200: #E7E9EC;        /* үндсэн бичвэр, гарчиг */
 
   /* Типографи — нэг гэр бүл, 3 жин (өмнө 18 жин, 3 гэр бүл) */
-  --font: "Montserrat", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font: "Manrope", -apple-system, "Segoe UI", system-ui, sans-serif;
   /* Дээд хязгаар нь ДЭЛГЭЦЭД зориулагдсан. Өмнө нь max утга хэт өндөр
      (h2 = 41.6px @1440) байсан тул дэлгэц дээр мобайл хувилбарыг
      томруулсан мэт харагдаж байв. Доод (min) утга ХЭВЭЭР — мобайл
@@ -2006,7 +2006,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   --aw-mid: #404040;
   --aw-muted: #b3b3b3;
   --aw-light: #d9d9d9;
-  --aw-display: "Oswald", "Montserrat", system-ui, sans-serif;
+  --aw-display: "Oswald", "Manrope", system-ui, sans-serif;
   background: var(--c-ink);
 }
 
@@ -2725,7 +2725,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .ms-id__cat {
   margin: 0 0 clamp(8px, 1.4vh, 18px);
   font-size: var(--fs-meta); font-weight: 600;
-  letter-spacing: .3em; text-transform: uppercase;
+  letter-spacing: .2em; text-transform: uppercase; /* Manrope: .3em хэт сарнисан */
   color: var(--c-muted);
 }
 
@@ -2735,7 +2735,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .ms-id__name {
   margin: 0;
   font-size: clamp(2.75rem, 6vw, 5rem);
-  font-weight: 600; letter-spacing: -.042em; line-height: .9;
+  font-weight: 600; letter-spacing: -.03em; line-height: .95;
   color: var(--c-ink);
 }
 

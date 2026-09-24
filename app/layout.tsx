@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Montserrat } from "next/font/google";
+import { Manrope } from "next/font/google";
 import Script from "next/script";
 
 import "./site.css";
@@ -8,12 +8,15 @@ import "./font.css"; /* ⚠ site.css-ийн ДАРАА — `--font`-ыг дар�
 import BackToTop from "@/components/BackToTop";
 import { SITE_URL, IS_PRODUCTION_HOST } from "@/lib/site-url";
 
-/* Дизайны системийн §1: НЭГ гэр бүл, 3 жин. Илүү жин татахгүй. */
-const montserrat = Montserrat({
+/* Дизайны системийн §1: НЭГ гэр бүл. Manrope — цэвэрхэн, кирилл
+   дээр жигд, жижиг хэмжээнд уншигдах; Montserrat-ын өргөн геометр
+   кирилл нь «futuristic» мэдрэмж өгч байсныг сольсон. Премиум байдлыг
+   фонтоор биш — зай, хэмжээ, зураг, шатлалаар гаргана. */
+const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "600", "700"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
-  variable: "--font-montserrat",
+  variable: "--font-manrope",
 });
 
 export const metadata: Metadata = {
@@ -50,7 +53,7 @@ export default function RootLayout({
     /* `no-js` нь site.js ачаалагдмагц хасагдана. Түүнийг хүлээж
        байх хооронд CSS нь «JS-гүй» нөөц харагдацыг үзүүлнэ —
        агуулга хэзээ ч алга болохгүй. */
-    <html lang="mn" className={`no-js ${montserrat.variable}`}>
+    <html lang="mn" className={`no-js ${manrope.variable}`}>
       <body>
         <a className="skip" href="#main">
           Үндсэн агуулга руу шилжих

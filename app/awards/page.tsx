@@ -90,7 +90,7 @@ export default function AwardsPage() {
       className={`t-dark ${oswald.variable}`}
       style={
         {
-          "--aw-display": "var(--font-oswald), Montserrat, system-ui, sans-serif",
+          "--aw-display": "var(--font-oswald), Manrope, system-ui, sans-serif",
         } as React.CSSProperties
       }
     >
