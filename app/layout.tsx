@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Manrope } from "next/font/google";
+import { Inter, Manrope } from "next/font/google";
 import Script from "next/script";
 
 import "./site.css";
@@ -8,13 +8,20 @@ import "./font.css"; /* ⚠ site.css-ийн ДАРАА — `--font`-ыг дар�
 import BackToTop from "@/components/BackToTop";
 import { SITE_URL, IS_PRODUCTION_HOST } from "@/lib/site-url";
 
-/* Дизайны системийн §1: НЭГ гэр бүл. Manrope — цэвэрхэн, кирилл
-   дээр жигд, жижиг хэмжээнд уншигдах; Montserrat-ын өргөн геометр
-   кирилл нь «futuristic» мэдрэмж өгч байсныг сольсон. Премиум байдлыг
-   фонтоор биш — зай, хэмжээ, зураг, шатлалаар гаргана. */
+/* Дизайны системийн §1: ХОЁР гэр бүл, үүрэг тусдаа.
+   · Inter — UI, навигац, бичвэр, товч, шошго. Монгол кирилл (Ө, Ү)
+     14–18px дээр цэвэр, жигд, мэргэжлийн.
+   · Manrope — зөвхөн загварын том нэр (Tiggo 8 г.м.), орчин үеийн
+     бүтээгдэхүүний дүр төрхөд.
+   Хоёулаа variable, `next/font`-оор сайт дээрээ хадгалагдана
+   (Google Fonts-оос гадагш ачаалахгүй). */
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
+  display: "swap",
+  variable: "--font-inter",
+});
 const manrope = Manrope({
   subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700"],
   display: "swap",
   variable: "--font-manrope",
 });
@@ -53,7 +60,7 @@ export default function RootLayout({
     /* `no-js` нь site.js ачаалагдмагц хасагдана. Түүнийг хүлээж
        байх хооронд CSS нь «JS-гүй» нөөц харагдацыг үзүүлнэ —
        агуулга хэзээ ч алга болохгүй. */
-    <html lang="mn" className={`no-js ${manrope.variable}`}>
+    <html lang="mn" className={`no-js ${inter.variable} ${manrope.variable}`}>
       <body>
         <a className="skip" href="#main">
           Үндсэн агуулга руу шилжих

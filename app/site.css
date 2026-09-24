@@ -52,7 +52,7 @@
   --mist-200: #E7E9EC;        /* үндсэн бичвэр, гарчиг */
 
   /* Типографи — нэг гэр бүл, 3 жин (өмнө 18 жин, 3 гэр бүл) */
-  --font: "Manrope", -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font: "Inter", -apple-system, "Segoe UI", system-ui, sans-serif;
   /* Дээд хязгаар нь ДЭЛГЭЦЭД зориулагдсан. Өмнө нь max утга хэт өндөр
      (h2 = 41.6px @1440) байсан тул дэлгэц дээр мобайл хувилбарыг
      томруулсан мэт харагдаж байв. Доод (min) утга ХЭВЭЭР — мобайл
@@ -213,7 +213,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   margin: 0;
   font-size: var(--fs-meta);
   font-weight: 600;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--c-muted);
 }
@@ -270,7 +270,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
   white-space: nowrap;   /* товчны бичвэр хуваагдахгүй */
   min-height: 48px; padding-inline: var(--s-6);
-  font: inherit; font-size: var(--fs-small); font-weight: 600;
+  font: inherit; font-size: var(--fs-small); font-weight: 600; letter-spacing: -.01em;
   border: 1px solid transparent; border-radius: var(--radius-btn);
   text-decoration: none; cursor: pointer;
   transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
@@ -533,7 +533,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
        бичвэр болж байв — шатлал урвуу эргэсэн. 14px/600 нь
        холбоосуудтай (500 жин) ижил өндөртэй боловч жингээрээ
        ялгарна; сум нь «энэ бол үйлдэл» гэдгийг хэлнэ. */
-    font-size: 14px; letter-spacing: .05em;
+    font-size: 15px; letter-spacing: -.01em;
   }
   .nav.nav--hero .nav__cta:hover {
     background: transparent; color: #fff; border-color: transparent;
@@ -622,7 +622,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 /* ---------- Цэсний нарийвчлал — ЖИЖИГ, ЗАЙТАЙ ----------
    §3: цэс нь hero-г дарж болохгүй. Шошго нь жижиг, үсэг хоорондын
    зай нь илүү — хэмжээгээрээ биш, зайгаараа анхаарал татна. */
-.nav__links a { font-weight: 500; letter-spacing: .04em; }
+.nav__links a { font-weight: 500; letter-spacing: -.01em; } /* кирилл дээр сарниулахгүй */
 
 /* CTA — «том улаан тэгш өнцөгт» биш. 224×54 (≥1260px) нь §3-ын
    220–260 × 52–58 хүрээнд. Hover дээр 2px өргөгдөнө, сүүдэр нэмэхгүй.
@@ -638,7 +638,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    товчийг «зочин» биш, хэсэг болгоно. */
 .nav .nav__cta {
   min-width: 188px;
-  font-size: 14px; letter-spacing: .05em;
+  font-size: 15px; letter-spacing: -.01em;
   transition:
     background-color 220ms var(--ease),
     transform 220ms var(--ease);
@@ -1058,8 +1058,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    descender маскаас гарч тайрагддаг (рендерээр баригдсан). */
 .hero__title {
   margin: 0 0 var(--s-4);
+  font-family: var(--font-display);
   font-size: clamp(2.25rem, 3.6vw, 3rem);
-  font-weight: 600; letter-spacing: -.03em; line-height: 1.04;
+  font-weight: 500; letter-spacing: -.035em; line-height: 1.02;
   color: #fff;
 }
 
@@ -1116,7 +1117,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 /* Хэмжээг `.btn--lg` хэлнэ; `.btn--hero` нь ЗӨВХӨН зургийн дээрх
    контекстын ялгааг (типографи, өргөгдөх хөдөлгөөн) хариуцна. */
 .btn--hero {
-  font-size: 15px; font-weight: 600; letter-spacing: .04em;
+  font-size: 15px; font-weight: 600; letter-spacing: -.01em;
   transition:
     background-color 240ms var(--ease),
     border-color 240ms var(--ease),
@@ -1198,7 +1199,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
        масштаблана (64px→1.9px, 28px→0.8px). Хэмжигдэхгүй
        жижиг, гэхдээ багана нь ЦЭВЭР босоо шугам болно. */
     margin-left: -.03em;
-    font-weight: 400;
+    font-weight: 600; /* Manrope — итгэлтэй, хэврэг бус */
     /* ⚠ МУРУЙ 4.2vw → 3.6vw (доод хязгаар 3.25 → 2.9rem).
        Асуудал нь ДЭЭД хязгаарт биш, ДУНД ӨРГӨНД байв:
          1440: 60.5px — кадар 33% нарийссан ч гарчиг бараг хэвээр
@@ -1208,7 +1209,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
        Шинэ муруй: 1280→46 · 1440→52 · 1600→58 · ≥1778→64px.
        1920-гийн харагдац ХЭВЭЭР. */
     font-size: clamp(2.9rem, 3.6vw, 4rem);
-    letter-spacing: -.024em; line-height: 1.04;
+    letter-spacing: -.035em; line-height: 1;
   }
   .hero--home .hero__plates { margin-bottom: clamp(2rem, 2.6vw, 2.75rem); }
   /* Макет: «Subheading Medium 20–24px», өнгө «Text Secondary».
@@ -1234,7 +1235,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   .hero--home .hero__actions { gap: var(--s-6); }
   .hero--home .btn--onphoto.btn--hero {
     min-height: 44px; min-width: 0; padding-inline: 0;
-    font-size: 15px; letter-spacing: .02em;
+    font-size: 15px; letter-spacing: -.01em;
   }
 
   /* Зурвас — баруун доод буланд, бичвэрийн блокоос хол. */
@@ -2006,7 +2007,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   --aw-mid: #404040;
   --aw-muted: #b3b3b3;
   --aw-light: #d9d9d9;
-  --aw-display: "Oswald", "Manrope", system-ui, sans-serif;
+  --aw-display: "Oswald", "Inter", system-ui, sans-serif;
   background: var(--c-ink);
 }
 
@@ -2725,7 +2726,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .ms-id__cat {
   margin: 0 0 clamp(8px, 1.4vh, 18px);
   font-size: var(--fs-meta); font-weight: 600;
-  letter-spacing: .2em; text-transform: uppercase; /* Manrope: .3em хэт сарнисан */
+  letter-spacing: .14em; text-transform: uppercase; /* кирилл том үсэг — дунд зэрэг */
   color: var(--c-muted);
 }
 
@@ -2735,7 +2736,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 .ms-id__name {
   margin: 0;
   font-size: clamp(2.75rem, 6vw, 5rem);
-  font-weight: 600; letter-spacing: -.03em; line-height: .95;
+  font-family: var(--font-display);
+  font-weight: 600; letter-spacing: -.035em; line-height: .98;
   color: var(--c-ink);
 }
 
@@ -2758,7 +2760,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 
 .ms-id__desc {
   margin: 0;
-  font-size: var(--fs-small); line-height: 1.5;
+  font-size: clamp(15px, 1.15vw, 17px); line-height: 1.5; letter-spacing: -.01em;
   color: var(--c-muted);
   max-width: min(46ch, 100%);
 }
@@ -3173,7 +3175,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
    шахаж, гарсан зайг тайзанд өгнө. */
 @media (min-width: 900px) and (max-height: 950px) {
   .ms-id__name { font-size: clamp(2.25rem, 4vw, 3.25rem); }
-  .ms-id__desc { font-size: var(--fs-meta); }
+  .ms-id__desc { font-size: 14px; }
   .ms { row-gap: clamp(6px, 1vh, 14px); }
 }
 

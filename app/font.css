@@ -12,5 +12,7 @@
    ⚠ Импортын дараалал ЧУХАЛ: `site.css`-ийн ДАРАА байх ёстой,
    эс тэгвээс `site.css`-ийн `--font` үүнийг дарна. */
 :root {
-  --font: var(--font-manrope), -apple-system, "Segoe UI", system-ui, sans-serif;
+  --font: var(--font-inter), -apple-system, "Segoe UI", system-ui, sans-serif;
+  /* Загварын том нэрс л */
+  --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
 }
