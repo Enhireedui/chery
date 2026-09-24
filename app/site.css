@@ -386,6 +386,17 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   border: 1px solid var(--c-line); border-radius: var(--radius-sm);
 }
 .burger > summary::-webkit-details-marker { display: none; }
+/* Цэс нээлттэй үед хуудас бүдгэрнэ; дарахад хаагдана (`site.js`) */
+.burger__backdrop {
+  position: fixed; inset: 0; z-index: -1;
+  background: rgba(8, 8, 10, .5);
+  opacity: 0; pointer-events: none;
+  transition: opacity 200ms var(--ease);
+}
+.burger[open] .burger__backdrop { opacity: 1; pointer-events: auto; }
+.burger__panel { z-index: 1; }
+html.menu-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .burger__backdrop { transition: none; } }
 .burger__panel {
   position: absolute; right: 0; top: calc(100% + 12px);
   width: min(78vw, 320px);
@@ -526,7 +537,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
     color: #fff;
     border-color: transparent;
     min-width: 0;
-    min-height: 40px;
+    min-height: 44px;
     padding-inline: 0;
     /* ⚠ 13 → 14px. 13px үед CTA нь цэсний холбоосуудаас (14–16px)
        ЖИЖИГ болж, хөрвөлтийн үйлдэл нь толгойн ХАМГИЙН жижиг
@@ -1739,7 +1750,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   .hero.hero--model .btn-row { flex-wrap: nowrap; gap: var(--s-3); }
   .hero.hero--model .btn-row .btn {
     width: auto; padding-inline: var(--s-4);
-    font-size: 13px; min-height: 46px;
+    font-size: 13px; min-height: 48px;
   }
 }
 .hero .btn--secondary { color: #fff; border-color: rgba(255,255,255,.62); }
@@ -1785,7 +1796,9 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
   border-top: 1px solid rgba(255,255,255,.22);
   display: grid; grid-template-columns: repeat(4, auto); justify-content: start; gap: var(--s-3) var(--s-6);
 }
-.mh__specs div { display: grid; gap: 2px; }
+.mh__specs div { display: grid; gap: 2px; align-content: start; }
+/* Утга дээр, шошго доор — шошго хоёр мөр болсон ч утгууд нэг шугамд */
+.mh__specs dd { order: -1; }
 .mh__specs dt { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.6); }
 .mh__specs dd { margin: 0; font-size: 15px; font-weight: 600; color: #fff; letter-spacing: -.01em; }
 .mh .btn-row { margin-top: var(--s-6); }

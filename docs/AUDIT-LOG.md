@@ -18,8 +18,8 @@ Status: ✅ fixed & verified · 🟡 open · ⏸ deferred (lower priority).
 | M3 | No persistent action on long mobile pages | P1 | — | Mobile action bar after the hero, hidden at the footer | 390 screenshot, bar shows mid-page | ✅ |
 | M4 | Tiggo 4 hero copy sat over the car grille at 1280–1440; on phones the copy covered the car on every model | P1 | Studio `t4-34` has the car centred; on phones the copy was overlaid on a full-height image | Asset **`hero-t4-terelj-v2`** (existing; car right of centre, left third clear) + `hero-t4-terelj-v2-tall`; desktop `object-position: 70% 55%`. **Mobile uses a stacked layout** (image in a 4:3 frame, copy below on a dark ground) so text cannot overlap the car. Key-spec row sizes to the verified specs (3 for Tiggo 4 → 3 columns, no empty slot) | Visually verified before/after at 1440/1280/768/430/390/360: copy/image overlap −24px (none); image 270–329px tall on phones; CTAs above the fold at 360×780–430×932 (not at 360×640); no horizontal scroll; CLS 0 | ✅ |
 | M6 | Header overflowed by 8–18px at 1000–1280 after the new menu items | P1 | Five groups + phone + CTA wider than the container | Phone from 1440px; tighter menu at 1000–1259; slimmer CTA at 1000–1099 | 10 routes × 9 widths: no horizontal overflow | ✅ |
-| M7 | At 360px the «Хүчин чадал, м.х» label wraps to two lines, so its value sits one line lower than its neighbours | P2 | Narrow 3-column row | — | Screenshot 360 | ⏸ |
-| M5 | Section heading repeats the bare model name (H2 «Tiggo 8») | P2 | Template | — | Heading outline | ⏸ |
+| M7 | At 360px «Хүчин чадал, м.х» wrapped to two lines, so its value sat lower than its neighbours | P2 | Unit in the label; label above value | Unit moved into the value (`109 / 154 м.х`), label «Хүчин чадал»; value shown above its label (`dd { order: -1 }`), same convention on all models | 360/390/430/768: all three values on one line, labels 20px, font 12px unchanged | ✅ |
+| M5 | Sections repeated the model name as a heading («Tiggo 4-ийн шийдлүүд», gallery H2 «Tiggo 4») | P2 | Template used `m.name` as section titles | «Гол шийдлүүд» (story: safety, tech, drivetrain) and «Гадна ба дотоод орчин» (gallery: exterior + interior shots) — headings describe existing content | 4 model pages: one H1, no H2 equal to the model name, no level skips | ✅ |
 
 ## Contact / test-drive
 
@@ -42,5 +42,11 @@ Status: ✅ fixed & verified · 🟡 open · ⏸ deferred (lower priority).
 | # | Issue | Sev | Cause | Fix | Verification | Status |
 |---|---|---|---|---|---|---|
 | N1 | New sub-menus had no mobile pattern | P1 | — | `<details>` accordions, 48px rows | 390: open/close, Esc and outside tap close | ✅ |
-| N2 | Burger button label stays «Цэс нээх» when open | P2 | Static `aria-label` on `<summary>` | — | — | ⏸ |
-| N3 | Menu panel opens without a backdrop | P2 | Design | — | — | ⏸ |
+| N2 | Burger label stayed «Цэс нээх» when open | P2 | Static `aria-label` on `<summary>` | `toggle` handler sets «Цэс хаах»/«Цэс нээх» and `aria-expanded`; `aria-controls="burger-panel"`; Esc closes and returns focus to the button | Keyboard: Enter opens, Tab enters the panel, Esc closes with focus back on the button (outline visible) | ✅ |
+| N3 | Menu opened with no backdrop; page stayed scrollable | P2 | Design | `rgba(8,8,10,.5)` backdrop (no blur), tap closes; `html.menu-open { overflow: hidden }`; opacity transition off under reduced motion | Backdrop opacity 1 when open, 0 when closed; tap closes and unlocks scroll; no scroll jump (600 → 600) | ✅ |
+
+## Final P2 sweep
+
+Home, 4 model pages, contact, service × 1440/1280/1024/768/430/390/360 (49 combinations) + mobile menu:
+all 200, load at `scrollY 0`, no horizontal overflow, one H1, no heading skips, no text under 12px, menu never clipped, no console errors.
+Button heights normalised: 44px desktop, 48px touch (hero-header text CTA 40 → 44, mobile model hero 46 → 48).

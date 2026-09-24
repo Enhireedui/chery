@@ -266,7 +266,7 @@ export default async function ModelPage({
         {/* ---------- Наалдмал өгүүлэмж ---------- */}
         <section className="section">
           <div className="container">
-            <Head eyebrow="Онцлог" title={`${m.name}-ийн шийдлүүд`} />
+            <Head eyebrow="Онцлог" title="Гол шийдлүүд" />
             <div className="story" data-story>
               <div className="story__media">
                 <div className="story__pic">
@@ -306,7 +306,7 @@ export default async function ModelPage({
         {m.gallery ? (
           <section className="section section--surface section--tight">
             <div className="container">
-              <Head eyebrow="Галерей" title={m.name} />
+              <Head eyebrow="Галерей" title="Гадна ба дотоод орчин" />
               <div className="strip">
                 {m.gallery.map((g) => (
                   <figure key={g}>

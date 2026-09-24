@@ -1133,9 +1133,10 @@ export const compareRows: CompareGroup[] = [
    (Tiggo 7-д үзүүлэлт баталгаажаагүй тул хоосон). Хоёр хувилбартай
    загварт (Tiggo 4) «v1 / v2».
    ============================================================ */
-const KEY_SPECS: Array<{ label: string; pick: string[] }> = [
+/* Нэгж нь УТГАД (`183 м.х`), шошго богино — 360px-д мөр хуваагдахгүй. */
+const KEY_SPECS: Array<{ label: string; pick: string[]; unit?: string }> = [
   { label: "Хөдөлгүүр", pick: ["Хөдөлгүүр"] },
-  { label: "Хүчин чадал, м.х", pick: ["Дээд хүчин чадал (морины хүч)", "Дээд хүчин чадал (м.х)"] },
+  { label: "Хүчин чадал", pick: ["Дээд хүчин чадал (морины хүч)", "Дээд хүчин чадал (м.х)"], unit: "м.х" },
   { label: "Хурдны хайрцаг", pick: ["Хурдны хайрцаг"] },
   { label: "Суудал", pick: ["Суудлын тоо"] },
 ];
@@ -1145,7 +1146,10 @@ export function keySpecs(m: Model): Array<[string, string]> {
   const out: Array<[string, string]> = [];
   for (const k of KEY_SPECS) {
     const r = rows.find((row) => k.pick.includes(row[0]));
-    if (r) out.push([k.label, r.slice(1).filter(Boolean).join(" / ")]);
+    if (r) {
+      const v = r.slice(1).filter(Boolean).join(" / ");
+      out.push([k.label, k.unit ? `${v} ${k.unit}` : v]);
+    }
   }
   return out;
 }

@@ -150,7 +150,7 @@ export default function Nav({
         </a>
 
         <details className="burger">
-          <summary aria-label="Цэс нээх">
+          <summary aria-label="Цэс нээх" aria-expanded="false" aria-controls="burger-panel">
             <svg
               width="20"
               height="20"
@@ -163,7 +163,8 @@ export default function Nav({
               <path d="M3 6h18M3 12h18M3 18h18" />
             </svg>
           </summary>
-          <nav className="burger__panel" aria-label="Мобайл цэс">
+          <span className="burger__backdrop" aria-hidden="true" />
+          <nav className="burger__panel" id="burger-panel" aria-label="Мобайл цэс">
             <a className="burger__phone" href={site.phoneHref}>
               {site.phone}
             </a>

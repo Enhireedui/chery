@@ -463,14 +463,29 @@
   function initBurger() {
     var d = document.querySelector(".burger");
     if (!d) return;
+    var sum = d.querySelector("summary");
+    var close = function (refocus) {
+      if (!d.hasAttribute("open")) return;
+      d.removeAttribute("open");
+      if (refocus && sum) sum.focus();
+    };
+    /* Төлөв: aria-label/expanded, хуудасны гүйлгэлт түгжигдэнэ */
+    d.addEventListener("toggle", function () {
+      var open = d.hasAttribute("open");
+      if (sum) {
+        sum.setAttribute("aria-expanded", open ? "true" : "false");
+        sum.setAttribute("aria-label", open ? "Цэс хаах" : "Цэс нээх");
+      }
+      document.documentElement.classList.toggle("menu-open", open);
+    });
     d.addEventListener("click", function (e) {
-      if (e.target.closest("a")) d.removeAttribute("open");
+      if (e.target.closest("a") || e.target.closest(".burger__backdrop")) close(false);
     });
     document.addEventListener("click", function (e) {
-      if (d.hasAttribute("open") && !d.contains(e.target)) d.removeAttribute("open");
+      if (!d.contains(e.target)) close(false);
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") d.removeAttribute("open");
+      if (e.key === "Escape") close(true);
     });
   }
 
