@@ -32,14 +32,7 @@ export default function ModelSelector({
 }) {
   const railRef = useRef<HTMLDivElement>(null);
 
-  /* Утсан дээр эгнээ хэвтээ гүйдэг тул сонгогдсон нь хүрээнээс гарч
-     болзошгүй (жишээ нь сум/шудралтаар солиход). Харагдах байдалд нь
-     зөөлөн буцааж оруулна. `block: "nearest"` нь ХУУДСЫГ босоогоор
-     гүйлгэхээс сэргийлнэ — эс тэгвэл загвар солих бүрд хуудас үсэрнэ. */
-  /* ⚠ `scrollIntoView` БИШ: `block: "nearest"` нь элемент дэлгэцээс
-     гадуур байхад ХУУДСЫГ босоогоор гүйлгэдэг — нүүр хуудас ачаалагдмагц
-     hero-г алгасаж загварын хэсэг рүү үсэрч байв. Зөвхөн эгнээг
-     өөрийг нь хэвтээ гүйлгэнэ. */
+  // Keep the active model visible without scrolling the page vertically.
   useEffect(() => {
     const rail = railRef.current;
     if (!rail || rail.scrollWidth <= rail.clientWidth) return;
@@ -47,7 +40,7 @@ export default function ModelSelector({
     if (!el) return;
     const er = el.getBoundingClientRect(), rr = rail.getBoundingClientRect();
     rail.scrollTo({
-      left: rail.scrollLeft + (er.left - rr.left) - (rail.clientWidth - er.width) / 2,
+      left: Math.max(0, rail.scrollLeft + (er.left - rr.left) - (rail.clientWidth - er.width) / 2),
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
         ? "auto"
         : "smooth",

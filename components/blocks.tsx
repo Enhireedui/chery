@@ -80,9 +80,11 @@ export function ModelCard({ m }: { m: Model }) {
    ══════════════════════════════════════════════════════════════ */
 export function BookingForm() {
   return (
-    <form className="form reveal" method="post" action="/api/lead">
+    /* `#захиалга` маягт дээр — утсан дээр шоурумын мэдээлэл түрүүлж
+       байрладаг тул хэсгийн зангуу нь маягтыг нугалаанаас доош үлдээж байв. */
+    <form className="form reveal" id="захиалга" method="post" action="/api/lead">
       <p className="meta">Тест драйв · Үнийн санал</p>
-      <h3 className="h3">Хүсэлт илгээх</h3>
+      <h2 className="h3">Хүсэлт илгээх</h2>
 
       <div className="field">
         <label htmlFor="f-name">Нэр</label>
@@ -146,7 +148,7 @@ export function BookingForm() {
 /* ---------- Шоурум + маягтын хэсэг ---------- */
 export function CtaSection() {
   return (
-    <section className="section section--surface" id="захиалга">
+    <section className="section section--surface" id="шоурум">
       <div className="container split">
         <div className="head reveal" style={{ marginBottom: 0 }}>
           <p className="meta">Шоурум</p>

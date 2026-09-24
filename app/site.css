@@ -2090,7 +2090,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 700; letter-spacing: -0.02em; line-heig
 /* ---------- 17б. ХӨЛНИЙ ХЭРЭГСЛИЙН ХОЛБООС ---------- */
 .foot__links { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; }
 /* 34px нь хуруунд жижиг — QA барив */
-.foot__links a { min-height: 40px; }
+.foot__links a { min-height: 44px; } /* хүрэх талбай ≥ 44px */
 
 /* ---------- 17в. CHIP — сонголтын шошго ----------
    Радио/чекбоксыг нууж, шошгыг өөрийг нь дарах талбай болгоно.

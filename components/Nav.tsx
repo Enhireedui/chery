@@ -43,11 +43,14 @@ const Chevron = () => (
   </svg>
 );
 
-/** Идэвхтэй эсэх: өөрөө эсвэл дэд холбоосын зам таарвал */
+/** Идэвхтэй эсэх: өөрөө эсвэл дэд холбоосын ХУУДАС таарвал.
+ *  Маягт руу заадаг үйлдлийн цэс («Худалдан авалт») нь /contact дээр
+ *  «Холбоо барих»-тай давхар тодрохгүй. */
+const path = (h: string) => h.split(/[?#]/)[0];
 const isActive = (n: NavItem, active: string) =>
   !!active &&
-  (n.href.split(/[?#]/)[0] === active ||
-    (n.children ?? []).some((c) => c.href.split(/[?#]/)[0] === active));
+  !n.href.includes("?") &&
+  (path(n.href) === active || (n.children ?? []).some((c) => path(c.href) === active));
 
 export default function Nav({
   active = "",
