@@ -1,5 +1,6 @@
-import { site, models, type Model } from "@/lib/content";
+import type { Model } from "@/lib/content";
 import { priceLabel } from "@/lib/format";
+import { getI18n } from "@/lib/i18n-server";
 import { modelHref } from "@/lib/routes";
 import Pic from "./Pic";
 
@@ -43,23 +44,24 @@ export function Head({
 }
 
 /* ---------- Загварын карт ---------- */
-export function ModelCard({ m }: { m: Model }) {
+export async function ModelCard({ m }: { m: Model }) {
+  const { locale, t, href } = await getI18n();
   return (
-    <a className="card reveal" href={modelHref(m.id)}>
+    <a className="card reveal" href={href(modelHref(m.id))}>
       <span className="card__media">
         <Pic
           name={m.card}
-          alt={`CHERY ${m.name} — гадна тал`}
+          alt={t("common.exterior", { model: m.name })}
           sizes="(min-width:1040px) 280px, (min-width:640px) 46vw, 92vw"
         />
       </span>
       <span className="card__body">
-        <span className="meta">{m.segment}</span>
+        <span className="meta">{t(`models.segment.${m.segment}`)}</span>
         <span className="h3">{m.name}</span>
-        <span className="card__price">{priceLabel(m)}</span>
+        <span className="card__price">{await priceLabel(m, locale)}</span>
         <span className="card__cta">
           <span className="link">
-            Дэлгэрэнгүй <Arrow />
+            {t("common.learnMore")} <Arrow />
           </span>
         </span>
       </span>
@@ -71,40 +73,40 @@ export function ModelCard({ m }: { m: Model }) {
    Тест драйвын маягт — «Холбоо барих» хуудасны БҮТЭН хувилбар.
 
    ⚙ Модалын маягт (нэр + утас) нь `LeadModal`-д тусад нь байна.
-   Энд нэр, утас, имэйл, загвар, зорилго бүгд бий.
 
    `action="/api/lead"` + `method="post"`:
    JS ажиллахгүй ч маягт нь СЕРВЕР РҮҮ ХҮРНЭ — route handler нь
    `Accept` толгойгоор шийдэж, JS-гүй тохиолдолд redirect-ээр
-   хариулна (Phase 21). Прогрессив enhancement хэвээр.
+   (`locale` талбарын хэлээр) хариулна. Прогрессив enhancement.
    ══════════════════════════════════════════════════════════════ */
-export function BookingForm() {
+export async function BookingForm() {
+  const { locale, t, c } = await getI18n();
   return (
     /* `#захиалга` маягт дээр — утсан дээр шоурумын мэдээлэл түрүүлж
        байрладаг тул хэсгийн зангуу нь маягтыг нугалаанаас доош үлдээж байв. */
     <form className="form reveal" id="захиалга" method="post" action="/api/lead">
-      <p className="meta">Тест драйв · Үнийн санал</p>
-      <h2 className="h3">Хүсэлт илгээх</h2>
+      <p className="meta">{t("form.eyebrow")}</p>
+      <h2 className="h3">{t("form.title")}</h2>
 
       <div className="field">
-        <label htmlFor="f-name">Нэр</label>
+        <label htmlFor="f-name">{t("form.name")}</label>
         <input id="f-name" name="name" type="text" autoComplete="name" required />
       </div>
       <div className="field">
-        <label htmlFor="f-phone">Утас</label>
+        <label htmlFor="f-phone">{t("form.phone")}</label>
         <input id="f-phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" placeholder="9911 2233" required />
       </div>
       <div className="field">
         <label htmlFor="f-email">
-          Имэйл <span>(заавал биш)</span>
+          {t("form.email")} <span>{t("form.optional")}</span>
         </label>
         <input id="f-email" name="email" type="email" autoComplete="email" />
       </div>
       <div className="field">
-        <label htmlFor="f-model">Загвар</label>
+        <label htmlFor="f-model">{t("form.model")}</label>
         <select id="f-model" name="model" data-lead-model>
-          <option value="">Сонгоогүй</option>
-          {models.map((m) => (
+          <option value="">{t("form.noModel")}</option>
+          {c.models.map((m) => (
             <option key={m.id} value={m.id}>
               {m.name}
             </option>
@@ -113,21 +115,21 @@ export function BookingForm() {
       </div>
 
       <fieldset className="fieldset">
-        <legend>Зорилго</legend>
+        <legend>{t("form.purpose")}</legend>
         <div className="radios">
           <label>
-            <input type="radio" name="purpose" value="test-drive" defaultChecked /> Тест драйв
+            <input type="radio" name="purpose" value="test-drive" defaultChecked /> {t("form.purposeTestDrive")}
           </label>
           <label>
-            <input type="radio" name="purpose" value="quote" /> Үнийн санал
+            <input type="radio" name="purpose" value="quote" /> {t("form.purposeQuote")}
           </label>
           <label>
-            <input type="radio" name="purpose" value="advice" /> Зөвлөгөө
+            <input type="radio" name="purpose" value="advice" /> {t("form.purposeAdvice")}
           </label>
         </div>
       </fieldset>
 
-      {/* Спам урхи — хүн харахгүй, бот бөглөнө (Phase 6) */}
+      {/* Спам урхи — хүн харахгүй, бот бөглөнө */}
       <input
         type="text"
         name="company"
@@ -137,28 +139,31 @@ export function BookingForm() {
         style={{ position: "absolute", left: "-9999px", width: 1, height: 1 }}
       />
       <input type="hidden" name="source_path" data-lead-source value="" />
+      <input type="hidden" name="locale" value={locale} />
 
       <button className="btn btn--primary" type="submit">
-        Илгээх
+        {t("form.send")}
       </button>
     </form>
   );
 }
 
 /* ---------- Шоурум + маягтын хэсэг ---------- */
-export function CtaSection() {
+export async function CtaSection() {
+  const { t, c } = await getI18n();
+  const { site } = c;
   return (
     <section className="section section--surface" id="шоурум">
       <div className="container split">
         <div className="head reveal" style={{ marginBottom: 0 }}>
-          <p className="meta">Шоурум</p>
+          <p className="meta">{t("form.showroom")}</p>
           <h2 className="h2">{site.address.line1}</h2>
           <p className="body">{site.address.line2}</p>
           <ul className="rows">
-            {site.hours.map(([d, t]) => (
+            {site.hours.map(([d, h]) => (
               <li key={d}>
                 <span className="meta">{d}</span>
-                {t}
+                {h}
               </li>
             ))}
           </ul>
@@ -166,13 +171,8 @@ export function CtaSection() {
             <a className="btn btn--secondary" href={site.phoneHref}>
               {site.phone}
             </a>
-            <a
-              className="btn btn--secondary"
-              href={site.mapLink}
-              target="_blank"
-              rel="noopener"
-            >
-              Газрын зураг дээр
+            <a className="btn btn--secondary" href={site.mapLink} target="_blank" rel="noopener">
+              {t("form.onMap")}
             </a>
           </div>
         </div>

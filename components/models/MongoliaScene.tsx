@@ -21,7 +21,6 @@ export default function MongoliaScene() {
       <source media="(max-width: 767px)" type="image/avif" srcSet="/assets/img/ms-gold-pan.avif" />
       <source media="(max-width: 767px)" type="image/webp" srcSet="/assets/img/ms-gold-pan.webp" />
       <source type="image/avif" srcSet="/assets/img/ms-gold.avif" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/assets/img/ms-gold.webp"
         width={2560}

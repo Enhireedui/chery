@@ -37,7 +37,6 @@ export default function Pic({
   return (
     <picture>
       <source srcSet={`/assets/img/${name}.avif`} type="image/avif" sizes={sizes} />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={`/assets/img/${name}.webp`}
         alt={alt}

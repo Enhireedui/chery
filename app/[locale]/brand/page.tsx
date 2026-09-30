@@ -1,30 +1,37 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Pic from "@/components/Pic";
 import { Head, CtaSection } from "@/components/blocks";
-import { brand } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import { alternates, localePath, ogBase, type Locale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Брэнд",
-  description:
-    "CHERY брэнд: 22 жил дараалан Хятадын экспортын тэргүүлэгч, 120+ орон, Fortune Global 500 #223, J.D. Power шагналууд.",
-  alternates: { canonical: "/brand" },
-  openGraph: { title: "Брэнд — CHERY Mongolia", url: "/brand" },
-};
+type Props = { params: Promise<{ locale: Locale }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "brand" });
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: alternates(locale, "/brand"),
+    openGraph: { ...ogBase(locale), title: `${t("title")} — CHERY Mongolia`, url: localePath(locale, "/brand") },
+  };
+}
 
 /** Он цагийн жагсаалт — рекорд ба шагнал хоёуланд ижил бүтэц. */
 function Timeline({ items }: { items: Array<[string, string, string]> }) {
   return (
     <ul className="timeline">
-      {items.map(([y, t, b]) => (
-        <li className="reveal" key={t}>
+      {items.map(([y, title, body]) => (
+        <li className="reveal" key={title}>
           <p className="meta">{y}</p>
           <div>
-            <h3 className="h3">{t}</h3>
+            <h3 className="h3">{title}</h3>
             <p className="body" style={{ marginTop: "var(--s-2)" }}>
-              {b}
+              {body}
             </p>
           </div>
         </li>
@@ -33,28 +40,29 @@ function Timeline({ items }: { items: Array<[string, string, string]> }) {
   );
 }
 
-export default function BrandPage() {
+export default async function BrandPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("brand");
+  const { brand } = getContent(locale);
+
   return (
     <>
-      <Nav active="/brand" />
+      <Nav active="/brand" path="/brand" />
       <main id="main">
         <section className="hero">
           <div className="hero__stage">
             <div className="hero__slide" data-active>
-              <Pic
-                name="brand-factory"
-                alt="CHERY-гийн үйлдвэрийн угсралтын шугам"
-                sizes="100vw"
-                eager
-              />
+              <Pic name="brand-factory" alt={t("heroAlt")} sizes="100vw" eager />
             </div>
             <div className="hero__scrim" />
             <div className="hero__body">
               <div className="container">
                 <div className="hero__copy">
-                  <p className="meta">Брэнд</p>
+                  <p className="meta">{t("eyebrow")}</p>
                   <h1 className="hero__title" style={{ fontSize: "var(--fs-h1)" }}>
-                    Он цагийн шалгуур<span>давсан чанар</span>
+                    {t("h1a")}
+                    <span>{t("h1b")}</span>
                   </h1>
                 </div>
               </div>
@@ -77,22 +85,14 @@ export default function BrandPage() {
 
         <section className="section">
           <div className="container">
-            <Head
-              eyebrow="Рекорд"
-              title="Экспортын түүх"
-              body="Хятадын аль ч автомашины компани давтаж чадаагүй үзүүлэлтүүд."
-            />
+            <Head eyebrow={t("recordsEyebrow")} title={t("recordsTitle")} body={t("recordsBody")} />
             <Timeline items={brand.records} />
           </div>
         </section>
 
         <section className="section section--surface">
           <div className="container">
-            <Head
-              eyebrow="Хүлээн зөвшөөрөл"
-              title="J.D. Power үнэлгээ"
-              body="Гүйцэтгэл, загвар, чанарын олон улсын судалгаанд эзэлсэн байр."
-            />
+            <Head eyebrow={t("awardsEyebrow")} title={t("awardsTitle")} body={t("awardsBody")} />
             <Timeline items={brand.awards} />
           </div>
         </section>

@@ -1,31 +1,26 @@
 import type { Metadata } from "next";
 import { Oswald } from "next/font/google";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Pic from "@/components/Pic";
 import { Arrow } from "@/components/blocks";
-import { awards, models } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import { alternates, localePath, ogBase, type Locale } from "@/lib/i18n";
 import { awardsJsonLd } from "@/lib/jsonld";
 import { TEST_DRIVE_HREF, modelHref } from "@/lib/routes";
 
 /* ══════════════════════════════════════════════════════════════
    ШАГНАЛ, АМЖИЛТ — амьд сайтын `brand1` хуудасны залгамж.
 
-   ⚠ ЭНЭ ХУУДАС ДИЗАЙНЫ СИСТЕМЭЭС ЗОРИУД ГАРСАН (README «awards»):
+   ⚠ ЭНЭ ХУУДАС ДИЗАЙНЫ СИСТЕМЭЭС ЗОРИУД ГАРСАН (захиалагчийн шийдвэр):
    гүйдэг тууз, 0-оос өсөх тоолуур, тугны эможи, бүхэлдээ хар
    хуудас, Oswald дэлгэцийн фонт. Эдгээрийг ЗӨВХӨН энд хэрэглэнэ.
 
-   ⚙ Oswald нь `next/font`-оор өөрөө host-логдоно: CSP-ийн
-   `font-src` нь зөвхөн өөрийн доменыг зөвшөөрдөг тул статик
-   хувилбарын Google Fonts <link> энд ажиллахгүй. Хувьсагч нь
-   зөвхөн энэ хуудасны боодол дээр холбогдоно — бусад хуудсанд
-   Oswald ачаалагдахгүй (DESIGN-SYSTEM.md §1).
-
-   ⚙ `t-dark` нь статик хувилбарт <body>-гийн класс байсан. App
-   Router-т <body> нь үндсэн layout-д нэг л удаа бичигддэг тул
-   хуудсаа боодол <div>-ээр хардуулав — сонгогч бүр `.t-dark …`
-   хэлбэртэй тул үр дүн ижил.
+   ⚙ Oswald нь `next/font`-оор өөрөө host-логдоно (CSP-ийн `font-src`
+   зөвхөн өөрийн доменыг зөвшөөрдөг). Хувьсагч нь зөвхөн энэ хуудасны
+   боодол дээр холбогдоно — бусад хуудсанд Oswald ачаалагдахгүй.
    ══════════════════════════════════════════════════════════════ */
 
 const oswald = Oswald({
@@ -35,27 +30,21 @@ const oswald = Oswald({
   variable: "--font-oswald",
 });
 
-export const metadata: Metadata = {
-  title: "Шагнал, амжилт",
-  description:
-    "CHERY-гийн олон улсын шагнал: Fortune Global 500 #233, Kantar BrandZ авто ангиллын #1, " +
-    "J.D. Power Triple Crown, 22 дараалсан жил Хятадын экспортын тэргүүн, A-NCAP ба C-NCAP 5 од.",
-  alternates: { canonical: "/awards" },
-  openGraph: { title: "Шагнал, амжилт — CHERY Mongolia", url: "/awards" },
-};
+type Props = { params: Promise<{ locale: Locale }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "awards" });
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: alternates(locale, "/awards"),
+    openGraph: { ...ogBase(locale), title: `${t("title")} — CHERY Mongolia`, url: localePath(locale, "/awards") },
+  };
+}
 
 /** Хэсгийн толгой: улаан нүдний хараа + зураас, дараа нь 2 мөрт гарчиг. */
-function AwHead({
-  eyebrow,
-  l1,
-  l2,
-  lede,
-}: {
-  eyebrow: string;
-  l1: string;
-  l2?: string;
-  lede?: string;
-}) {
+function AwHead({ eyebrow, l1, l2, lede }: { eyebrow: string; l1: string; l2?: string; lede?: string }) {
   return (
     <div className="aw-head reveal">
       <p className="aw-eyebrow">{eyebrow}</p>
@@ -68,8 +57,12 @@ function AwHead({
   );
 }
 
-export default function AwardsPage() {
-  const a = awards;
+export default async function AwardsPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations();
+  const { awards: a, models } = getContent(locale);
+  const href = (p: string) => localePath(locale, p);
 
   /* JS ажиллахгүй бол эцсийн тоо ШУУД харагдана — `site.js` нь
      `data-to`-г уншиж 0-оос өсгөнө. */
@@ -78,9 +71,9 @@ export default function AwardsPage() {
   /* Тууз — агуулгыг ХОЁР УДАА бичнэ. `translateX(-50%)` нь яг нэг
      хуулбарын өргөнөөр гүйх тул давхарлалт үл мэдэгдэнэ. */
   const tickerRun = (key: string) =>
-    a.ticker.map((t) => (
-      <span key={`${key}-${t}`}>
-        <span>{t}</span>
+    a.ticker.map((item) => (
+      <span key={`${key}-${item}`}>
+        <span>{item}</span>
         <span className="ticker__dot">·</span>
       </span>
     ));
@@ -88,41 +81,24 @@ export default function AwardsPage() {
   return (
     <div
       className={`t-dark ${oswald.variable}`}
-      style={
-        {
-          "--aw-display": "var(--font-oswald), Manrope, system-ui, sans-serif",
-        } as React.CSSProperties
-      }
+      style={{ "--aw-display": "var(--font-oswald), Manrope, system-ui, sans-serif" } as React.CSSProperties}
     >
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(awardsJsonLd()) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(await awardsJsonLd(locale)) }}
       />
 
-      <Nav active="/awards" />
+      <Nav active="/awards" path="/awards" />
 
       <main id="main">
         <section className="hero aw-hero">
           <div className="hero__stage" style={{ aspectRatio: "21 / 9" }}>
             <div className="hero__slide" data-active="">
               <picture>
-                <source
-                  media="(max-width: 767px)"
-                  srcSet={`/assets/img/${a.hero.img}-tall.avif`}
-                  type="image/avif"
-                />
-                <source
-                  media="(max-width: 767px)"
-                  srcSet={`/assets/img/${a.hero.img}-tall.webp`}
-                  type="image/webp"
-                />
+                <source media="(max-width: 767px)" srcSet={`/assets/img/${a.hero.img}-tall.avif`} type="image/avif" />
+                <source media="(max-width: 767px)" srcSet={`/assets/img/${a.hero.img}-tall.webp`} type="image/webp" />
                 <source srcSet={`/assets/img/${a.hero.img}.avif`} type="image/avif" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`/assets/img/${a.hero.img}.webp`}
-                  alt="CHERY Tiggo 8 — үдшийн гэрэлд"
-                  fetchPriority="high"
-                />
+                <img src={`/assets/img/${a.hero.img}.webp`} alt={t("awards.heroAlt")} fetchPriority="high" />
               </picture>
             </div>
             <div className="hero__scrim" />
@@ -131,7 +107,8 @@ export default function AwardsPage() {
                 <div className="hero__copy aw-hero__copy">
                   <p className="aw-badge">{a.hero.badge}</p>
                   <h1 className="aw-display aw-display--hero">
-                    Дэлхийд танигдсан<span>брэнд</span>
+                    {t("awards.h1a")}
+                    <span>{t("awards.h1b")}</span>
                   </h1>
                   <p className="body">{a.lede}</p>
                 </div>
@@ -149,7 +126,7 @@ export default function AwardsPage() {
 
         <section className="section section--ink section--tight">
           <div className="container">
-            <p className="aw-eyebrow reveal">Тоо баримт</p>
+            <p className="aw-eyebrow reveal">{t("awards.figures")}</p>
             <div className="aw-tiles">
               {a.figures.map((f) => (
                 <div className="aw-tile reveal" key={f.label}>
@@ -173,10 +150,10 @@ export default function AwardsPage() {
         <section className="section section--ink">
           <div className="container">
             <AwHead
-              eyebrow="Дэлхийн хүлээн зөвшөөрөл"
-              l1="Дэлхийн алдарт"
-              l2="CHERY"
-              lede="Шагнал бүрийн ард түүнийг олгосон байгууллага, он нь бичигдсэн."
+              eyebrow={t("awards.globalEyebrow")}
+              l1={t("awards.globalA")}
+              l2={t("awards.globalB")}
+              lede={t("awards.globalLede")}
             />
             <div className="aw-grid aw-grid--2">
               {a.global.map((g) => (
@@ -184,7 +161,7 @@ export default function AwardsPage() {
                   <p className="aw-year num">{g.year}</p>
                   <h3 className="h3">{g.title}</h3>
                   <p className="body">{g.body}</p>
-                  <p className="aw-src">Эх сурвалж: {g.src}</p>
+                  <p className="aw-src">{t("awards.source", { src: g.src })}</p>
                 </article>
               ))}
             </div>
@@ -193,12 +170,7 @@ export default function AwardsPage() {
 
         <section className="section section--ink">
           <div className="container">
-            <AwHead
-              eyebrow="J.D. Power"
-              l1="Хятадын цорын ганц"
-              l2="Triple Crown"
-              lede={a.jdp.lede}
-            />
+            <AwHead eyebrow="J.D. Power" l1={t("awards.jdpA")} l2={t("awards.jdpB")} lede={a.jdp.lede} />
             <div className="aw-grid aw-grid--3">
               {a.jdp.rows.map(([rank, name, body]) => (
                 <article className="aw-card aw-card--rank reveal" key={name}>
@@ -214,10 +186,10 @@ export default function AwardsPage() {
         <section className="section section--ink">
           <div className="container">
             <AwHead
-              eyebrow="Загварууд"
-              l1="Дэлхийн 20+ оронд"
-              l2="хүлээн зөвшөөрөгдсөн"
-              lede="Монголд борлуулагдаж буй дөрвөн загварын олон улсын үнэлгээ."
+              eyebrow={t("awards.modelsEyebrow")}
+              l1={t("awards.modelsA")}
+              l2={t("awards.modelsB")}
+              lede={t("awards.modelsLede")}
             />
             <div className="aw-grid aw-grid--2">
               {a.byModel.map((m) => {
@@ -228,7 +200,7 @@ export default function AwardsPage() {
                       <div className="aw-model__pic">
                         <Pic
                           name={model.card}
-                          alt={`CHERY ${model.name} — гадна тал`}
+                          alt={t("common.exterior", { model: model.name })}
                           sizes="(min-width:760px) 46vw, 92vw"
                         />
                       </div>
@@ -242,8 +214,8 @@ export default function AwardsPage() {
                     </ul>
                     {model ? (
                       <p className="aw-card__cta">
-                        <a className="link" href={modelHref(m.id)}>
-                          Загварын хуудас <Arrow />
+                        <a className="link" href={href(modelHref(m.id))}>
+                          {t("common.viewModel")} <Arrow />
                         </a>
                       </p>
                     ) : null}
@@ -256,7 +228,7 @@ export default function AwardsPage() {
 
         <section className="section section--ink">
           <div className="container">
-            <AwHead eyebrow="Экспортын рекорд" l1="22 жил дараалан" l2="тэргүүлэгч" />
+            <AwHead eyebrow={t("awards.recordsEyebrow")} l1={t("awards.recordsA")} l2={t("awards.recordsB")} />
             <ul className="aw-recs">
               {a.records.map(([year, title, body, tag]) => (
                 <li className="aw-rec reveal" key={title}>
@@ -274,11 +246,7 @@ export default function AwardsPage() {
 
         <section className="section section--ink">
           <div className="container">
-            <AwHead
-              eyebrow="Бүс нутгийн тэргүүлэлт"
-              l1="Бразилаас Египет,"
-              l2="Индонезээс Өмнөд Африк"
-            />
+            <AwHead eyebrow={t("awards.marketsEyebrow")} l1={t("awards.marketsA")} l2={t("awards.marketsB")} />
             <div className="aw-grid aw-grid--4">
               {a.markets.map(([flag, place, title, body]) => (
                 <article className="aw-card reveal" key={place}>
@@ -299,10 +267,10 @@ export default function AwardsPage() {
         <section className="section section--ink" id="аюулгүй-байдал">
           <div className="container">
             <AwHead
-              eyebrow="Аюулгүй байдал"
-              l1="Хараат бус"
-              l2="мөргөлдөөний шалгалт"
-              lede="Гурван тивийн хамгийн хатуу хөтөлбөрийн үнэлгээ."
+              eyebrow={t("awards.safetyEyebrow")}
+              l1={t("awards.safetyA")}
+              l2={t("awards.safetyB")}
+              lede={t("awards.safetyLede")}
             />
             <div className="aw-grid aw-grid--3">
               {a.safety.map(([score, org, model, when, body]) => (
@@ -323,17 +291,17 @@ export default function AwardsPage() {
           <div className="container">
             <div className="aw-cta reveal">
               <div>
-                <p className="aw-eyebrow">Дараагийн алхам</p>
+                <p className="aw-eyebrow">{t("awards.ctaEyebrow")}</p>
                 <p className="h2" style={{ marginTop: "var(--s-4)" }}>
-                  Эдгээрийг бодитоор мэдрэх
+                  {t("awards.ctaTitle")}
                 </p>
               </div>
               <div className="btn-row">
-                <a className="btn btn--primary" href={TEST_DRIVE_HREF}>
-                  Тест драйв захиалах
+                <a className="btn btn--primary" href={href(TEST_DRIVE_HREF)}>
+                  {t("common.testDrive")}
                 </a>
-                <a className="btn btn--secondary" href="/models">
-                  Загварууд үзэх
+                <a className="btn btn--secondary" href={href("/models")}>
+                  {t("common.viewModels")}
                 </a>
               </div>
             </div>

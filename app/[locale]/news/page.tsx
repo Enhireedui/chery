@@ -1,44 +1,48 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import { Head, CtaSection } from "@/components/blocks";
-import { site, news } from "@/lib/content";
+import { getContent } from "@/lib/content";
+import { alternates, localePath, ogBase, type Locale } from "@/lib/i18n";
 
-export const metadata: Metadata = {
-  title: "Мэдээ, мэдээлэл",
-  description:
-    "CHERY-ийн шинэ загвар, брэндийн мэдээ, үйлчилгээний шинэчлэлт, үйл явдлууд.",
-  alternates: { canonical: "/news" },
-  openGraph: { title: "Мэдээ, мэдээлэл — CHERY Mongolia", url: "/news" },
-};
+type Props = { params: Promise<{ locale: Locale }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "news" });
+  return {
+    title: t("title"),
+    description: t("description"),
+    alternates: alternates(locale, "/news"),
+    openGraph: { ...ogBase(locale), title: `${t("title")} — CHERY Mongolia`, url: localePath(locale, "/news") },
+  };
+}
 
 /* ⚠ НИЙТЛЭЛ ЗОХИООГҮЙ. `news` нь одоогоор хоосон массив —
    бодит мэдээ гарах хүртэл хоосон төлөв харагдана. Хуурамч
    нийтлэл бичих нь хэрэглэгчийг төөрөгдүүлнэ (DESIGN-SYSTEM §11).
    Мэдээ 3 болмогц толгойн цэсэнд буцаана. */
-export default function NewsPage() {
+export default async function NewsPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("news");
+  const { site, news } = getContent(locale);
+
   return (
     <>
-      <Nav active="/news" />
+      <Nav active="/news" path="/news" />
       <main id="main">
         <section className="section">
           <div className="container">
-            <Head
-              level={1}
-              eyebrow="Мэдээ"
-              title="Мэдээ, мэдээлэл"
-              body="CHERY-ийн шинэ загвар, брэндийн мэдээ, үйлчилгээний шинэчлэлт, үйл явдлууд."
-            />
+            <Head level={1} eyebrow={t("eyebrow")} title={t("title")} body={t("description")} />
 
             {news.length === 0 ? (
               <div className="empty reveal">
-                <p className="meta">Хоосон</p>
-                <h2 className="h3">Мэдээ удахгүй нэмэгдэнэ</h2>
-                <p className="body">
-                  Шинэ загвар, үйлчилгээний шинэчлэлт, үйл явдлын мэдээллийг энд
-                  нийтэлнэ. Одоогоор шоурумаас шууд мэдээлэл авна уу.
-                </p>
+                <p className="meta">{t("emptyEyebrow")}</p>
+                <h2 className="h3">{t("emptyTitle")}</h2>
+                <p className="body">{t("emptyBody")}</p>
                 <a className="btn btn--secondary" href={site.phoneHref}>
                   {site.phone}
                 </a>

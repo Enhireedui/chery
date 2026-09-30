@@ -1,59 +1,42 @@
-import { models } from "./content";
+import { getTranslations } from "next-intl/server";
+
+import { getContent } from "./content";
 import { priceLabel } from "./format";
+import { localePath, type L, type Locale } from "./i18n";
 import { modelHref } from "./routes";
 
 /* ══════════════════════════════════════════════════════════════
    ЗАГВАРЫН ҮЗҮҮЛЭНГИЙН ӨГӨГДӨЛ
 
    ⚙ ЯАГААД ЭНД ҮНЭ, СЕГМЕНТ ДАХИН БИЧИГДЭЭГҮЙ:
-   `lib/content.ts` нь агуулгын ЦОРЫН ГАНЦ эх сурвалж. Үнэ,
-   сегмент, хаягийг энд хуулбал хоёр газар засах шаардлагатай
-   болж, эрт орой хэзээ нэгэн цагт зөрнө. Тиймээс энэ файл нь
-   ЗӨВХӨН үзүүлэнд хэрэгтэй нэмэлт талбаруудыг (сэтгэл хөдлөлийн
-   тайлбар, шошгууд, тайзны зураг) тодорхойлж, үлдсэнийг
-   `models`-оос НИЙЛҮҮЛНЭ.
+   `lib/content.ts` нь агуулгын ЦОРЫН ГАНЦ эх сурвалж. Энэ файл нь
+   ЗӨВХӨН үзүүлэнд хэрэгтэй нэмэлт талбаруудыг (тайлбар, тайзны
+   зураг, орчны өнгө) тодорхойлж, үлдсэнийг `models`-оос НИЙЛҮҮЛНЭ.
+
+   ⚙ СЕРВЕР ДЭЭР ХЭЛЭНД БУУЛГАНА: `ModelsSection` нь client component
+   тул энд бэлэн мөр болгож props-оор дамжуулна — хөтөч рүү хоёр
+   хэлний агуулга, next-intl-ийн мессежүүд очихгүй.
 
    ⚙ ЗУРГИЙГ ОФФИЦИАЛ ФАЙЛААР СОЛИХ:
-   Одоогийн `t{n}-c-white.avif|webp` нь ЖИНХЭНЭ ТУНГАЛАГ
-   (alpha = 0) студийн cut-out — тиймээс бараан тайзан дээр
-   машин «хөвдөг», сүүдэр нь `drop-shadow`-оор кузовын
-   хэлбэрийг дагана.
-
-   Оффициал зураг ирвэл: ижил нэрээр (эсвэл `extras`-ын
-   `image`-ыг сольж) `public/assets/img/`-д AVIF + WebP хосоор
-   тавина — `npm run images` нь эх файлаас үүсгэнэ. ЗААВАЛ
-   тунгалаг дэвсгэртэй байх ёстой; дэвсгэртэй гэрэл зураг
-   ирвэл `site.css` §22-ын `.ms-stage__frame img` ба
-   `.ms-card__media img`-ыг `cover` болгож, `drop-shadow`-ыг
-   хасна (тэндээс тайлбарыг үз).
-
-   ⚠ ҮЗҮҮЛЭЛТ ЗОХИОХГҮЙ: `specs` шошгууд нь ЗӨВХӨН ангиллын
-   шинжтэй («Compact SUV», «5 суудал»). Морины хүч, түлшний
-   зарцуулалт, ADAS, баталгааны нөхцөл зэрэг БАТАЛГААЖААГҮЙ
-   тоог энд хэзээ ч бичихгүй — тэдгээр нь загварын хуудсанд,
-   баримтат эх сурвалжтайгаа хамт байна.
+   Одоогийн `t{n}-side.avif|webp` нь ЖИНХЭНЭ ТУНГАЛАГ (alpha = 0)
+   студийн cut-out — бараан тайзан дээр машин «хөвдөг», сүүдэр нь
+   `drop-shadow`-оор кузовын хэлбэрийг дагана. Оффициал зураг ирвэл
+   ижил нэрээр AVIF + WebP хосоор тавина; ЗААВАЛ тунгалаг дэвсгэртэй.
    ══════════════════════════════════════════════════════════════ */
-
-export type ModelCategory = "Compact SUV" | "Mid-size SUV" | "7 суудалтай SUV";
 
 export interface ShowcaseModel {
   id: string;
   name: string;
-  category: ModelCategory;
+  category: string;
   /** Бэлэн форматтай үнэ: «48,999,900 ₮-аас» эсвэл «Үнийн мэдээлэл авах» */
   price: string;
-  /** `request` бол үнэ зарлаагүй — CTA нь өөр эвент илгээнэ */
+  /** `request` бол үнэ зарлаагүй */
   priceType: "from" | "request";
   description: string;
-  /** Файлын нэр угтваргүй → `/assets/img/{image}.avif|webp`.
-   *  ТУНГАЛАГ (alpha) студийн cut-out, урд талаас 3/4 өнцгөөр.
-   *  Тайз, карт, зурвас ГУРВУУЛАА үүнийг ашиглана: нэг машин,
-   *  гурван хэмжээ — каталог шиг нэгдмэл. */
+  /** Файлын нэр угтваргүй → `/assets/img/{image}.avif|webp` (тунгалаг cut-out) */
   image: string;
   alt: string;
-  /** Ангиллын шинжтэй ГУРВАН шошго. Техникийн тоо БАЙХГҮЙ. */
-  specs: [string, string, string];
-  /** Тайзны орчны өнгө — доорх «ОРЧНЫ ӨНГӨ» тайлбарыг үз. */
+  /** Тайзны орчны өнгө — доорх тайлбарыг үз. */
   ambient: string;
   href: string;
 }
@@ -63,106 +46,67 @@ export interface ShowcaseModel {
 
    Загвар солигдоход тайзны ГЭРЭЛТҮҮЛЭГ нь тухайн машины өнгө рүү
    маш бага зэрэг шилжинэ — «студийн гэрлийг сольсон» мэдрэмж.
-
-   ⚠ `content.ts`-ийн `colors[]`-ыг ХЭРЭГЛЭХГҮЙ. Тэр нь худалдан
-   авагчийн СОНГОЖ БОЛОХ будгийн жагсаалт; үзүүлэн дээр гарч буй
-   рендер нь тэдний аль нэг нь байх албагүй. Орчны өнгө нь БОДИТ
-   харагдаж буй машинаас гарах ёстой.
-
-   Тиймээс `t{n}-side.webp`-ийн кузовын хажуу хавтангаас (цонхны
-   доор, хаяавчийн дээр) медиан өнгийг хэмжив:
-
-     Tiggo 4  #b1b2b3   L 70%  S 1%   — саармаг мөнгөлөг
-     Tiggo 7  #5d5e68   L 39%  S 6%   — хүйтэн бараан саарал
-     Tiggo 8  #1b1b1b   L 11%  S 0%   — бараг хар
-
-   Доорх утгууд нь тэр өнгийг ХҮЧТЭЙ буурааж (ханалт бараг тэг),
-   маш бага тунгалаг байдлаар өгсөн хувилбар. Будгийн өнгийг
-   ШУУД хэрэглэхгүй: тэр нь «өнгөт дэвсгэр» болно.
-
-   ⚠ Тунгалаг байдлыг 0.2-оос дээш болгохгүй. Энэ давхарга нь
-   кадрын ЗАХААР (винет хэлбэрээр) л тавигддаг тул машины эргэн
-   тойрны орчин өөрчлөгдөх ба машин өөрөө хөндөгдөхгүй.
+   `t{n}-side.webp`-ийн кузовын хажуу хавтангаас хэмжсэн медиан
+   өнгийг ханалт бараг тэг болтол буурааж өгсөн. Тунгалаг байдлыг
+   0.2-оос дээш болгохгүй — давхарга нь кадрын ЗАХААР л тавигдана.
    ══════════════════════════════════════════════════════════════ */
 
-/* Үзүүлэнд зориулсан нэмэлт талбарууд. Түлхүүр нь `content.ts`-ийн
-   загварын `id`. Шинэ загвар нэмэгдвэл ЭНД мөр нэмэхэд хангалттай. */
-const extras: Record<
-  string,
-  {
-    description: string;
-    image: string;
-    specs: [string, string, string];
-    ambient: string;
-  }
-> = {
+const extras: Record<string, { description: L; image: string; ambient: string }> = {
   "tiggo-2": {
-    description: "Хотын хэмнэлд тохирсон авсаархан, өөртөө итгэлтэй SUV.",
+    description: {
+      mn: "Хотын хэмнэлд тохирсон авсаархан, өөртөө итгэлтэй SUV.",
+      en: "A compact, confident SUV made for the rhythm of the city.",
+    },
     image: "t2-side",
-    specs: ["Compact SUV", "Хотын хэрэглээ", "5 суудал"],
-    /* Рендер алга — үзүүлэнд ороогүй. Саармаг утга. */
     ambient: "rgba(150, 156, 164, .10)",
   },
   "tiggo-4": {
-    description:
-      "Технологи, тав тух, өдөр тутмын практик хэрэглээг тэнцвэржүүлсэн SUV.",
+    description: {
+      mn: "Технологи, тав тух, өдөр тутмын практик хэрэглээг тэнцвэржүүлсэн SUV.",
+      en: "An SUV that balances technology, comfort and everyday practicality.",
+    },
     image: "t4-side",
-    specs: ["Compact SUV", "Өдөр тутмын хэрэглээ", "5 суудал"],
     /* #b1b2b3 — саармаг мөнгөлөг */
     ambient: "rgba(150, 156, 164, .10)",
   },
   "tiggo-7": {
-    description:
-      "Илүү том орон зай, технологи болон зоримог төрхийг нэгтгэсэн mid-size SUV.",
+    description: {
+      mn: "Өргөн уудам орон зай, ухаалаг технологи, зоримог дизайныг нэгтгэсэн дунд оврын SUV.",
+      en: "A mid-size SUV combining spacious comfort, intelligent technology and bold design.",
+    },
     image: "t7-side",
-    specs: ["Mid-size SUV", "Технологийн шийдэл", "Гэр бүлийн тав тух"],
     /* #5d5e68 — хүйтэн бараан саарал */
     ambient: "rgba(94, 103, 126, .13)",
   },
   "tiggo-8": {
-    description:
-      "Гэр бүл, аялал болон өдөр тутмын илүү өргөн хэрэгцээнд зориулагдсан 7 суудалтай SUV.",
+    description: {
+      mn: "Гэр бүл, аялал болон өдөр тутмын илүү өргөн хэрэгцээнд зориулагдсан 7 суудалтай SUV.",
+      en: "A seven-seat SUV for family life, road trips and everything in between.",
+    },
     image: "t8-side",
-    specs: ["7 суудал", "Гэр бүлийн SUV", "Өргөн салон"],
     /* #1b1b1b — гүн бал чулуун */
     ambient: "rgba(48, 52, 60, .13)",
   },
 };
 
-export const showcaseModels: ShowcaseModel[] = models.map((m) => {
-  const e = extras[m.id];
-  if (!e) throw new Error(`models-showcase: «${m.id}»-д үзүүлэнгийн өгөгдөл алга`);
-
-  return {
-    id: m.id,
-    name: m.name,
-    category: m.segment as ModelCategory,
-    price: priceLabel(m),
-    priceType: m.price ? "from" : "request",
-    description: e.description,
-    image: e.image,
-    /* Дэлгэц уншигчид зориулсан бүтэц: [загвар] + [юу] + [ямар өнцгөөс].
-       Сайтын хэл монгол тул alt ч монголоор — англи alt нь
-       монгол дэлгэц уншигчид утгагүй дуудагдана. */
-    alt: `CHERY ${m.name} — SUV, урд талаас 3/4 өнцгөөр`,
-    specs: e.specs,
-    ambient: e.ambient,
-    href: modelHref(m.id),
-  };
-});
-
-/* ---------- Ангиллын шүүлтүүр ----------
-   «Бүх загвар» нь `null` — тусдаа утга нь «шүүлтгүй» гэдгийг
-   төрлөөрөө хэлнэ, шидэт мөр («all») хэрэггүй. */
-export interface CategoryFilter {
-  id: string;
-  label: string;
-  value: ModelCategory | null;
+export async function getShowcase(locale: Locale): Promise<ShowcaseModel[]> {
+  const t = await getTranslations({ locale, namespace: "models" });
+  return Promise.all(
+    getContent(locale).models.map(async (m) => {
+      const e = extras[m.id];
+      if (!e) throw new Error(`models-showcase: «${m.id}»-д үзүүлэнгийн өгөгдөл алга`);
+      return {
+        id: m.id,
+        name: m.name,
+        category: t(`segment.${m.segment}`),
+        price: await priceLabel(m, locale),
+        priceType: m.price ? "from" : "request",
+        description: e.description[locale],
+        image: e.image,
+        alt: t("showcaseAlt", { name: m.name }),
+        ambient: e.ambient,
+        href: localePath(locale, modelHref(m.id)),
+      } satisfies ShowcaseModel;
+    })
+  );
 }
-
-export const categoryFilters: CategoryFilter[] = [
-  { id: "all", label: "Бүх загвар", value: null },
-  { id: "compact", label: "Compact SUV", value: "Compact SUV" },
-  { id: "mid", label: "Mid-size SUV", value: "Mid-size SUV" },
-  { id: "seven", label: "7 суудалтай SUV", value: "7 суудалтай SUV" },
-];

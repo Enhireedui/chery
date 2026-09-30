@@ -6,6 +6,21 @@
 
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  /* Хэлний мессежүүд — `messages/*.json`-ийн `js` хэсэг, layout нь
+     `<script id="site-i18n" type="application/json">`-д бичдэг. Энд
+     текст хатуу бичихгүй: English хуудсанд монгол мессеж гарахгүй. */
+  var T = {};
+  try { T = JSON.parse(document.getElementById("site-i18n").textContent) || {}; } catch (err) {}
+  function tr(key) { return T[key] || ""; }
+  function fill(tpl, model) { return (tpl || "").replace("{model}", model); }
+
+  /* Хэрэглэгчийн сонгосон загвар — хэл солиход дагуулна (§14). */
+  function markPicked(id, from) {
+    if (!id) return;
+    document.documentElement.setAttribute("data-picked-model", id);
+    document.documentElement.setAttribute("data-picked-from", from);
+  }
+
   /* ---------- 1. Кино слайдер — ЧИГЛЭЛТЭЙ ГУЛСАЛТ ----------
      Шинэ кадар хажуугаас бүтнээр гулсаж орж ирэхэд хуучин нь
      арагшаа 22% ухарна (параллакс түлхэлт). Уусалт БИШ — чиглэл
@@ -43,6 +58,15 @@
     for (var n0 = 0; n0 < slides.length; n0++) {
       if (slides[n0].hasAttribute("data-active")) { i = n0; break; }
     }
+    /* Хэл солиод ирсэн бол (`?model=tiggo-7`) тэр кадраас эхэлнэ. */
+    var want = new URLSearchParams(location.search).get("model");
+    var wantAt = -1;
+    for (var n1 = 0; want && n1 < slides.length; n1++) {
+      if (slides[n1].getAttribute("data-model") === want) { wantAt = n1; break; }
+    }
+    var base = root.getAttribute("data-model-base") || "/models/";
+    var tplDetail = root.getAttribute("data-label-explore") || "";
+    var tplLead = root.getAttribute("data-label-quote") || "";
     /* ⚠ 4000 → 6500. Дөрвөн секунд нь «слайдер»-ын хэмнэл байв:
        нүд загварын нэр, тайлбар, машин гурвыг уншиж амжихаас
        өмнө кадар солигддог. Люкс автомашины hero 6–8 секундэд
@@ -109,24 +133,17 @@
          JS ажиллахгүй бол эхний кадрын хаяг HTML-д аль хэдийн бичигдсэн.
          `aria-label` ч дагалдана — дэлгэц уншигчид «Дэлгэрэнгүй»
          гэсэн тодорхойгүй нэр биш, загварын нэртэй хүлээн авна. */
-      /* ⚠ ӨМНӨ "/models/" + id + ".html" БАЙСАН — тэр нь static
-         HTML болгон бүтээж байсан үеийн үлдэгдэл. Next.js-ийн
-         маршрут нь `/models/tiggo-2` тул `.html` нь 404 өгч
-         байсныг энэ дамжлагад зассан. */
+      /* Хаягийн угтвар (`/models/` эсвэл `/en/models/`) ба шошгын
+         загвар нь hero-гийн `data-*`-аас — хэлээр өөр. */
       var id = slides[i].getAttribute("data-model");
       var label = names[i] ? names[i].textContent.trim() : "";
       if (detail) {
-        if (id) detail.setAttribute("href", "/models/" + id);
-        if (label) {
-          detail.setAttribute("aria-label", "CHERY " + label + " — дэлгэрэнгүй үзэх");
-        }
+        if (id) detail.setAttribute("href", base + id);
+        if (label && tplDetail) detail.setAttribute("aria-label", fill(tplDetail, label));
       }
-      /* Анхдагч CTA нь ХАРАГДАЖ БУЙ загварыг нэрлэнэ. Харагдах
-         бичвэр («Үнийн санал авах») хэвээр — зөвхөн дэлгэц уншигчид
-         аль машины тухай мэдээлэл болохыг сонсоно. */
-      if (lead && label) {
-        lead.setAttribute("aria-label", "CHERY " + label + " — үнийн санал авах");
-      }
+      /* Анхдагч CTA нь ХАРАГДАЖ БУЙ загварыг нэрлэнэ — зөвхөн дэлгэц
+         уншигчид аль машины тухай мэдээлэл болохыг сонсоно. */
+      if (lead && label && tplLead) lead.setAttribute("aria-label", fill(tplLead, label));
 
       /* Байрлалын тоолуур. Явцын зураасны урт нь `--p` custom
          property-оор дамжина — CSS өөрөө тооцно, JS нь px
@@ -200,8 +217,15 @@
     /* Сонгосны дараа тоолуур ЭХНЭЭС нь эхэлнэ (`play()` нь
        `stop()`-оор өмнөх интервалыг цуцалдаг) — хэрэглэгч
        сонгосон машинаа бүтэн 4 секунд харна. */
+    /* Хэрэглэгчийн үйлдлээр солигдсон кадар = сонголт (автомат солилт биш). */
+    function pick(n, dir) {
+      show(n, dir);
+      play();
+      markPicked(slides[i].getAttribute("data-model"), "hero");
+    }
+
     dots.forEach(function (d, k) {
-      d.addEventListener("click", function () { show(k); play(); });
+      d.addEventListener("click", function () { pick(k); });
     });
 
     /* Удирдлага нь JS-гүй үед утгагүй тул маркапад `hidden` гэж
@@ -214,13 +238,13 @@
       /* Заагчаар шилжсэн нь «би өөрөө удирдаж байна» гэсэн санал
          тул зогсоолтыг ТАЙЛНА — эс тэгвээс дараах товч ажиллаад
          дараа нь юу ч болохгүй, төлөв нь ойлгомжгүй болно. */
-      if (prevBtn) prevBtn.addEventListener("click", function () { show(i - 1, -1); play(); });
-      if (nextBtn) nextBtn.addEventListener("click", function () { show(i + 1, 1); play(); });
+      if (prevBtn) prevBtn.addEventListener("click", function () { pick(i - 1, -1); });
+      if (nextBtn) nextBtn.addEventListener("click", function () { pick(i + 1, 1); });
     }
 
     root.addEventListener("keydown", function (e) {
-      if (e.key === "ArrowRight") { show(i + 1, 1); play(); }
-      else if (e.key === "ArrowLeft") { show(i - 1, -1); play(); }
+      if (e.key === "ArrowRight") pick(i + 1, 1);
+      else if (e.key === "ArrowLeft") pick(i - 1, -1);
     });
 
     /* Хэрэглэгч уншиж байхад бүү сольё */
@@ -283,6 +307,7 @@
         /* Чирэлтийн дараах суулт богино — CSS-ийн `data-quick` */
         frames.setAttribute("data-quick", "");
         show(moved < 0 ? i + 1 : i - 1, moved < 0 ? 1 : -1);
+        markPicked(slides[i].getAttribute("data-model"), "hero");
         setTimeout(function () { frames.removeAttribute("data-quick"); }, 900);
       }
 
@@ -305,6 +330,12 @@
       if (justDragged) { e.preventDefault(); e.stopPropagation(); }
     }, true);
 
+    /* `?model=`-ийн кадар нь хойшлуулсан байж болно — шууд залгана. */
+    if (wantAt > -1 && wantAt !== i) {
+      hydrateFrames();
+      i = wantAt;
+      markPicked(want, "hero");
+    }
     paint(-1);
     play();
   }
@@ -324,9 +355,16 @@
           if (j === k) im.setAttribute("data-shown", "");
           else im.removeAttribute("data-shown");
         });
+        /* MN: «Цагаан (Khaki White)», EN: «Khaki White» — `data-sub`
+           хоосон бол хаалт гарахгүй. `innerHTML` биш — DOM-оор. */
         if (name) {
-          name.innerHTML = b.getAttribute("data-mn") +
-            ' <span>(' + b.getAttribute("data-en") + ')</span>';
+          var sub = b.getAttribute("data-sub");
+          name.textContent = b.getAttribute("data-main") || "";
+          if (sub) {
+            var s = document.createElement("span");
+            s.textContent = " (" + sub + ")";
+            name.appendChild(s);
+          }
         }
       });
     });
@@ -396,27 +434,6 @@
     io.observe(el);
   }
 
-  /* ---------- 5. Харьцуулалт — багана унтраах ----------
-     JS-гүй үед дөрвүүлээ харагдана; чекбокс нь НЭМЭЛТ хялбарчлал.
-     Сүүлийн баганыг унтраахыг зөвшөөрөхгүй — хоосон хүснэгт
-     хэрэглэгчид ямар ч үнэ цэн өгөхгүй. */
-  function initCompare(root) {
-    var boxes = [].slice.call(root.querySelectorAll('input[name="cmp"]'));
-    if (!boxes.length) return;
-
-    function apply() {
-      var on = boxes.filter(function (b) { return b.checked; })
-                    .map(function (b) { return b.value; });
-      root.querySelectorAll("[data-col]").forEach(function (cell) {
-        cell.hidden = on.indexOf(cell.getAttribute("data-col")) === -1;
-      });
-      boxes.forEach(function (b) { b.disabled = b.checked && on.length === 1; });
-    }
-
-    boxes.forEach(function (b) { b.addEventListener("change", apply); });
-    apply();
-  }
-
   /* ---------- 5б. Цэсний төлөв — hero дээр тунгалаг ----------
      Hero-гийн доод ирмэг цэсний доогуур орох үед `is-stuck` нэмнэ.
      Гүйлгэлтийн сонсогч БИШ, IntersectionObserver — фрэйм алдахгүй. */
@@ -474,7 +491,7 @@
       var open = d.hasAttribute("open");
       if (sum) {
         sum.setAttribute("aria-expanded", open ? "true" : "false");
-        sum.setAttribute("aria-label", open ? "Цэс хаах" : "Цэс нээх");
+        sum.setAttribute("aria-label", tr(open ? "menuClose" : "menuOpen"));
       }
       document.documentElement.classList.toggle("menu-open", open);
     });
@@ -497,7 +514,7 @@
     btn.addEventListener("click", function () {
       var f = document.createElement("iframe");
       f.src = src;
-      f.title = "Шоурумын байршил — Google Maps";
+      f.title = tr("mapTitle");
       f.loading = "lazy";
       f.referrerPolicy = "no-referrer-when-downgrade";
       box.appendChild(f);
@@ -530,12 +547,11 @@
 
         /* Загварын нэр нь ХАРАГДАНА: хэрэглэгч аль машины тухай
            асууж байгаагаа маягт дээрээ баталгаажуулна. Hero-гүй
-           хуудсанд (эсвэл нэр байхгүй бол) анхдагч «Захиалга»
-           шошго хэвээр — хоосон мөр гарахгүй. */
+           хуудсанд анхдагч шошго («Захиалга» / «Enquiry»). */
         var tag = dlg.querySelector("[data-lead-model-name]");
         if (tag) {
-          var mn = active && active.getAttribute("data-name");
-          tag.textContent = mn ? "CHERY " + mn : "Захиалга";
+          var nm = active && active.getAttribute("data-name");
+          tag.textContent = nm ? "CHERY " + nm : tr("leadTag");
         }
 
         dlg.showModal();
@@ -618,10 +634,10 @@
      маягтын оронд хариуг харуулна. JS-гүй үед маягт энгийн POST
      хийж `/thanks` руу redirect болно. */
   var LEAD_ERRORS = {
-    validation: "Нэр, 8 оронтой утасны дугаараа шалгаад дахин илгээнэ үү.",
-    rate: "Хэт олон удаа илгээлээ. Түр хүлээгээд дахин оролдоно уу.",
-    config: "Маягт түр ажиллахгүй байна. Шоурум руу шууд залгана уу.",
-    server: "Илгээхэд алдаа гарлаа. Дахин оролдоно уу."
+    validation: "errValidation",
+    rate: "errRate",
+    config: "errConfig",
+    server: "errServer"
   };
 
   /* Утас: «9911 2233» — 8 оронтой дотоод дугаарыг 4-4 бүлэглэнэ,
@@ -708,16 +724,16 @@
         e.preventDefault();
         if (form.getAttribute("aria-busy") === "true") return;
         var bad = null;
-        if (name && !name.value.trim()) { fieldError(name, "Нэрээ оруулна уу."); bad = bad || name; }
+        if (name && !name.value.trim()) { fieldError(name, tr("nameRequired")); bad = bad || name; }
         if (phone && phoneDigits(phone.value).length !== 8) {
-          fieldError(phone, "8 оронтой утасны дугаараа оруулна уу.");
+          fieldError(phone, tr("phoneRequired"));
           bad = bad || phone;
         }
         if (bad) { bad.focus(); return; }
         if (src) src.value = location.pathname;
         form.setAttribute("aria-busy", "true");
         msg.hidden = true;
-        if (btn) { btn.disabled = true; btn.classList.add("is-loading"); btn.textContent = "Илгээж байна…"; }
+        if (btn) { btn.disabled = true; btn.classList.add("is-loading"); btn.textContent = tr("sending"); }
 
         fetch(form.action, {
           method: "POST",
@@ -730,17 +746,21 @@
               var done = document.createElement("div");
               done.className = "form";
               done.setAttribute("role", "status");
-              done.innerHTML =
-                '<p class="meta">Амжилттай</p><h3 class="h3">Хүсэлт амжилттай илгээгдлээ</h3>' +
-                '<p class="body">Манай зөвлөх ажлын цагаар тантай холбогдох болно.</p>';
+              [["p", "meta", "successMeta"], ["h3", "h3", "successTitle"], ["p", "body", "successBody"]]
+                .forEach(function (d) {
+                  var el = document.createElement(d[0]);
+                  el.className = d[1];
+                  el.textContent = tr(d[2]);
+                  done.appendChild(el);
+                });
               form.replaceWith(done);
               return;
             }
-            msg.textContent = LEAD_ERRORS[res.error] || LEAD_ERRORS.server;
+            msg.textContent = tr(LEAD_ERRORS[res.error] || LEAD_ERRORS.server);
             msg.hidden = false;
           })
           .catch(function () {
-            msg.textContent = "Интернет холболтоо шалгаад дахин оролдоно уу.";
+            msg.textContent = tr("network");
             msg.hidden = false;
           })
           .then(function () {
@@ -769,6 +789,33 @@
     if (foot) new IntersectionObserver(function (e) { footIn = e[0].isIntersecting; paint(); }).observe(foot);
   }
 
+  /* ---------- 14. ХЭЛ СОЛИХ — ИЖИЛ ХУУДСАНД ҮЛДЭНЭ ----------
+     Холбоос нь өөрөө зөв хуудас руу заадаг (`/en/models/tiggo-7`),
+     JS-гүй ч ажиллана. Энд нэмж дагуулна:
+       · одоогийн query (`?purpose=quote&model=tiggo-4`) ба hash
+       · hero эсвэл үзүүлэнд сонгосон загвар → `?model=`; үзүүлэнгээс
+         сонгосон бол `#models` руу буцааж гүйлгэнэ
+     `?lang=mn` (Монгол руу) хадгалагдана — middleware cookie-г шинэчилнэ. */
+  function initLang() {
+    document.querySelectorAll("a[data-lang-switch]").forEach(function (a) {
+      a.addEventListener("click", function (e) {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        var html = document.documentElement;
+        var url = new URL(a.href, location.href);
+        var q = new URLSearchParams(location.search);
+        q.delete("lang");
+        var picked = html.getAttribute("data-picked-model");
+        if (picked) q.set("model", picked);
+        url.searchParams.forEach(function (v, k) { q.set(k, v); });
+        var qs = q.toString();
+        url.search = qs ? "?" + qs : "";
+        url.hash = html.getAttribute("data-picked-from") === "models" ? "models" : location.hash;
+        e.preventDefault();
+        location.assign(url.toString());
+      });
+    });
+  }
+
   function ready() {
     document.documentElement.classList.remove("no-js");
     initMobileCta();
@@ -778,8 +825,8 @@
     document.querySelectorAll("[data-swatches]").forEach(initSwatches);
     document.querySelectorAll("[data-story]").forEach(initStory);
     document.querySelectorAll("[data-count]").forEach(initCount);
-    document.querySelectorAll("[data-cmp]").forEach(initCompare);
     document.querySelectorAll("[data-map]").forEach(initMap);
+    initLang();
     initNavState();
     initBurger();
     initModal();

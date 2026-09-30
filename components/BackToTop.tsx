@@ -31,13 +31,13 @@ const ArrowUp = () => (
   </svg>
 );
 
-export default function BackToTop() {
+export default function BackToTop({ label }: { label: string }) {
   return (
     <button
       type="button"
       className="to-top"
       data-to-top
-      aria-label="Дээш буцах"
+      aria-label={label}
     >
       <ArrowUp />
     </button>

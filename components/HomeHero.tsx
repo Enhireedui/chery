@@ -1,4 +1,4 @@
-﻿import { slides } from "@/lib/content";
+import { getI18n } from "@/lib/i18n-server";
 import { QUOTE_HREF, modelHref, FEATURED_MODEL_ID } from "@/lib/routes";
 import { Arrow } from "@/components/blocks";
 
@@ -49,18 +49,23 @@ const Chevron = ({ dir }: { dir: "prev" | "next" }) => (
 
    ⚠ Утга нь `lib/routes.ts`-ийн `FEATURED_MODEL_ID` — загварын
    үзүүлэн ч ЯГ ижил утгыг уншина тул hero, үзүүлэн хоёр хэзээ ч
-   өөр машинаар нээгдэхгүй (аудитын §4). */
-const initial = Math.max(0, slides.findIndex((s) => s.id === FEATURED_MODEL_ID));
-const first = slides[initial];
-
-export default function HomeHero() {
+   өөр машинаар нээгдэхгүй (аудитын §4). Хэл солих үед `?model=`
+   ирвэл `site.js` тэр кадраас эхэлнэ. */
+export default async function HomeHero() {
+  const { t, c, href } = await getI18n();
+  const slides = c.slides;
+  const initial = Math.max(0, slides.findIndex((s) => s.id === FEATURED_MODEL_ID));
+  const first = slides[initial];
   if (!first) return null;
 
   return (
     <section
       className="hero hero--home"
-      aria-roledescription="карусель"
-      aria-label="CHERY-гийн загварууд"
+      aria-roledescription={t("home.heroRole")}
+      aria-label={t("home.heroLabel")}
+      data-model-base={href("/models/")}
+      data-label-explore={t.raw("common.exploreModel") as string}
+      data-label-quote={t.raw("common.quoteModel") as string}
     >
       <div className="hero__stage">
         <div className="hero__frames">
@@ -111,7 +116,6 @@ export default function HomeHero() {
                     {...img(`${s.img}-tall.webp`)}
                   />
                   <source type="image/avif" {...img(`${s.img}.avif`)} />
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     alt={`CHERY ${s.model} — ${s.scene}`}
                     {...(isFirst
@@ -190,20 +194,20 @@ export default function HomeHero() {
               <div className="hero__actions">
                 <a
                   className="btn btn--primary btn--lg btn--hero"
-                  href={QUOTE_HREF}
+                  href={href(QUOTE_HREF)}
                   data-modal-open="lead-modal"
                   data-hero-lead
-                  aria-label={`CHERY ${first.model} — үнийн санал авах`}
+                  aria-label={t("common.quoteModel", { model: first.model })}
                 >
-                  Үнийн санал авах
+                  {t("common.quote")}
                 </a>
                 <a
                   className="btn btn--onphoto btn--hero"
                   data-hero-detail
-                  href={modelHref(first.id)}
-                  aria-label={`CHERY ${first.model} — дэлгэрэнгүй үзэх`}
+                  href={href(modelHref(first.id))}
+                  aria-label={t("common.exploreModel", { model: first.model })}
                 >
-                  Дэлгэрэнгүй үзэх
+                  {t("common.explore")}
                   <Arrow />
                 </a>
               </div>
@@ -222,7 +226,7 @@ export default function HomeHero() {
                   Төлөв нь өнгө ГАНЦААР дамжихгүй: идэвхтэйд явцын
                   зураас нэмэгдэнэ (§19) бөгөөд `aria-pressed` нь
                   дэлгэц уншигчид хүрнэ. */}
-              <div className="hero__rail" role="group" aria-label="Загвар сонгох">
+              <div className="hero__rail" role="group" aria-label={t("home.pickModel")}>
                 {slides.map((s, k) => (
                   <button
                     key={s.id}
@@ -257,7 +261,7 @@ export default function HomeHero() {
                   className="hero__arrow"
                   type="button"
                   data-hero-prev
-                  aria-label="Өмнөх загвар"
+                  aria-label={t("common.prev")}
                 >
                   <Chevron dir="prev" />
                 </button>
@@ -265,7 +269,7 @@ export default function HomeHero() {
                   className="hero__arrow"
                   type="button"
                   data-hero-next
-                  aria-label="Дараагийн загвар"
+                  aria-label={t("common.next")}
                 >
                   <Chevron dir="next" />
                 </button>

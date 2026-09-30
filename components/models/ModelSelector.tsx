@@ -23,11 +23,13 @@ export default function ModelSelector({
   models,
   activeIndex,
   busy,
+  label,
   onSelect,
 }: {
   models: ShowcaseModel[];
   activeIndex: number;
   busy: boolean;
+  label: string;
   onSelect: (i: number) => void;
 }) {
   const railRef = useRef<HTMLDivElement>(null);
@@ -52,7 +54,7 @@ export default function ModelSelector({
       ref={railRef}
       className="ms-rail"
       role="tablist"
-      aria-label="CHERY загвар сонгох"
+      aria-label={label}
     >
       {models.map((m, i) => (
         <button
@@ -67,7 +69,6 @@ export default function ModelSelector({
           <span className="ms-pick__img">
             <picture>
               <source type="image/avif" srcSet={`/assets/img/${thumbOf(m)}.avif`} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/assets/img/${thumbOf(m)}.webp`}
                 alt=""

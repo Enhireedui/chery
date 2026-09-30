@@ -1,16 +1,26 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import Link from "next/link";
 
 import AnimatedArrowIcon from "./AnimatedArrowIcon";
 import ModelInfo from "./ModelInfo";
 import ModelSelector from "./ModelSelector";
 import MongoliaScene from "./MongoliaScene";
-import { showcaseModels, type ShowcaseModel } from "@/lib/models-showcase";
+import type { ShowcaseModel } from "@/lib/models-showcase";
 import { WHEEL_ANCHORS } from "@/lib/wheel-anchors";
 import { track } from "@/lib/analytics";
 import { FEATURED_MODEL_ID } from "@/lib/routes";
+
+/** Серверээс хэлэнд буулгаж ирэх бичвэр (`app/[locale]/page.tsx`). */
+export interface ShowcaseLabels {
+  region: string;
+  prev: string;
+  next: string;
+  explore: string;
+  pick: string;
+  /** `{model}` орлуулагчтай: «CHERY {model} — дэлгэрэнгүй үзэх» */
+  exploreModel: string;
+}
 
 /* ══════════════════════════════════════════════════════════════
    ЗАГВАРЫН ҮЗҮҮЛЭН — нэг дэлгэцийн automotive композиц.
@@ -52,6 +62,12 @@ import { FEATURED_MODEL_ID } from "@/lib/routes";
 
    ⚠ JS АЖИЛЛАХГҮЙ БОЛ: онцлох машин голдоо, нэр, холбоос бүгд
    HTML-д. Зөвхөн солилт, өнхрөлт ажиллахгүй.
+
+   ⚠ ХОЛБООС НЬ `<a>`, `next/link` БИШ. Загварын хуудасны өнгө
+   сонгогч, өгүүлэмж, маягт, `.reveal` нь `site.js`-ээр ажилладаг бөгөөд
+   тэр нь зөвхөн бүтэн ачаалалт дээр init хийдэг. `<Link>`-ээр орвол
+   тэдгээр ажиллахгүй, Firefox/Safari дээр агуулга нь харагдахгүй
+   (opacity 0) үлдэж байсныг туршилтаар барив.
    ══════════════════════════════════════════════════════════════ */
 
 const EXCLUDE = new Set<string>(["tiggo-2"]);
@@ -211,7 +227,6 @@ function CarView({ m, eager }: { m: ShowcaseModel; eager: boolean }) {
         <source media="(max-width: 767px)" type="image/avif" srcSet={`/assets/img/${m.image}-mb.avif`} />
         <source media="(max-width: 767px)" type="image/webp" srcSet={`/assets/img/${m.image}-mb.webp`} />
         <source type="image/avif" srcSet={`/assets/img/${m.image}.avif`} />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={`/assets/img/${m.image}.webp`}
           alt={m.alt}
@@ -239,7 +254,6 @@ function CarView({ m, eager }: { m: ShowcaseModel; eager: boolean }) {
               <source media="(max-width: 767px)" type="image/avif" srcSet={`/assets/img/${a.rim}-mb.avif`} />
               <source media="(max-width: 767px)" type="image/webp" srcSet={`/assets/img/${a.rim}-mb.webp`} />
               <source type="image/avif" srcSet={`/assets/img/${a.rim}.avif`} />
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/assets/img/${a.rim}.webp`}
                 alt=""
@@ -262,8 +276,14 @@ const Chevron = ({ d }: { d: string }) => (
 
 /* ---------------------------------------------------------------- */
 
-export default function ModelsSection() {
-  const models = showcaseModels.filter((m) => !EXCLUDE.has(m.id));
+export default function ModelsSection({
+  showcase,
+  labels,
+}: {
+  showcase: ShowcaseModel[];
+  labels: ShowcaseLabels;
+}) {
+  const [models] = useState(() => showcase.filter((m) => !EXCLUDE.has(m.id)));
   const total = models.length;
 
   const featuredIndex = Math.max(
@@ -353,6 +373,31 @@ export default function ModelsSection() {
     },
     [go, models]
   );
+
+  /* Хэл солиод ирсэн бол (`?model=tiggo-7`) тэр загвараас шууд,
+     хөдөлгөөнгүй эхэлнэ. Hydration-ы дараа — SSR нь онцлох загвартай. */
+  useEffect(() => {
+    const id = new URLSearchParams(window.location.search).get("model");
+    const i = id ? models.findIndex((m) => m.id === id) : -1;
+    if (i < 0 || i === activeRef.current) return;
+    activeRef.current = i;
+    setNav({ active: i, outgoing: -1, dir: 1, from: 0 });
+  }, [models]);
+
+  /* Анхных биш загвар бүр хэрэглэгчийн сонголт (сонгогч, сум,
+     чирэлт, `?model=`). Хэл солиход `site.js` үүнийг `?model=`-оор
+     дагуулж, `#models` руу буцааж гүйлгэнэ. */
+  const pickedRef = useRef(false);
+  useEffect(() => {
+    if (!pickedRef.current) {
+      pickedRef.current = true;
+      return;
+    }
+    const m = models[safeActive];
+    if (!m) return;
+    document.documentElement.dataset.pickedModel = m.id;
+    document.documentElement.dataset.pickedFrom = "models";
+  }, [models, safeActive]);
 
   /* ---------- Гулсалт · өнхрөлт · кузовын хоцролт (нэг timeline) ---------- */
   useLayoutEffect(() => {
@@ -610,7 +655,7 @@ export default function ModelsSection() {
         className="ms-stage"
         role="group"
         aria-roledescription="carousel"
-        aria-label="CHERY загварын үзүүлэн"
+        aria-label={labels.region}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
@@ -621,7 +666,7 @@ export default function ModelsSection() {
           className="ms-side ms-side--prev"
           onClick={prev}
           disabled={busy || total < 2}
-          aria-label="Өмнөх загвар"
+          aria-label={labels.prev}
         >
           <Chevron d="M15 6l-6 6 6 6" />
         </button>
@@ -641,10 +686,10 @@ export default function ModelsSection() {
               >
                 <CarView m={m} eager={i === featuredIndex} />
                 {isActive && (
-                  <Link
+                  <a
                     href={m.href}
                     className="ms-car__link"
-                    aria-label={`CHERY ${m.name} — дэлгэрэнгүй үзэх`}
+                    aria-label={labels.exploreModel.replace("{model}", m.name)}
                     onClick={(e) => {
                       cancelIfDragged(e);
                       if (!e.defaultPrevented) onDetails(m, "stage");
@@ -662,7 +707,7 @@ export default function ModelsSection() {
           className="ms-side ms-side--next"
           onClick={next}
           disabled={busy || total < 2}
-          aria-label="Дараагийн загвар"
+          aria-label={labels.next}
         >
           <Chevron d="M9 6l6 6-6 6" />
         </button>
@@ -678,22 +723,23 @@ export default function ModelsSection() {
           Зүүн талд үйлдэл, баруун талд сонголт — төвлөрүүлээгүй,
           зориудын тэнцвэргүй байдал. */}
       <div className="container ms-foot">
-        <Link
+        <a
           className="ms-cta"
           key={`cta-${active.id}`}
           data-dir={nav.dir}
           href={active.href}
           onClick={() => onDetails(active, "cta")}
-          aria-label={`CHERY ${active.name} — дэлгэрэнгүй үзэх`}
+          aria-label={labels.exploreModel.replace("{model}", active.name)}
         >
-          Дэлгэрэнгүй үзэх
+          {labels.explore}
           <AnimatedArrowIcon />
-        </Link>
+        </a>
 
         <ModelSelector
           models={models}
           activeIndex={safeActive}
           busy={busy}
+          label={labels.pick}
           onSelect={(i) => onSelect(i, "rail")}
         />
       </div>

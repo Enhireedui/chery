@@ -1,0 +1,38 @@
+# Supabase Free project-ийг унтраахгүй байлгах (7 хоног идэвхгүй бол pause).
+# Долоо хоногт хоёр удаа `public.keepalive()` функцийг дуудна — хамгийн
+# урт зай 4 хоног. Өгөгдөл уншихгүй, бичихгүй (supabase/migrations/0002).
+#
+# Repo → Settings → Secrets and variables → Actions:
+#   SUPABASE_URL       https://<ref>.supabase.co
+#   SUPABASE_ANON_KEY  anon (public) key
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "17 3 * * 1,4" # Даваа, Пүрэв 03:17 UTC (11:17 Улаанбаатар)
+  workflow_dispatch: {}
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "::error::SUPABASE_URL / SUPABASE_ANON_KEY secrets are not set"
+            exit 1
+          fi
+          body=$(curl -sS --fail-with-body --retry 3 --retry-delay 10 \
+            -X POST "$SUPABASE_URL/rest/v1/rpc/keepalive" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json" \
+            -d '{}')
+          echo "Response: $body"
+          [ "$body" = "1" ]

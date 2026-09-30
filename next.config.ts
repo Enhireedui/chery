@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 /* ══════════════════════════════════════════════════════════════
    Хамгаалалтын толгойнууд (Phase 20)
@@ -76,6 +79,14 @@ const nextConfig: NextConfig = {
           { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
         ],
       },
+      {
+        /* `app/layout.tsx` нь site.js-ийг `?v=<хэш>`-тэй дууддаг тул
+           агуулга өөрчлөгдөхөд хаяг нь шинэчлэгдэнэ. */
+        source: "/assets/js/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
     ];
   },
 
@@ -93,7 +104,8 @@ const nextConfig: NextConfig = {
       ["/index.php/tiggo-8-2", "/models/tiggo-8"],
       ["/index.php/brand", "/brand"],
       ["/index.php/brand1", "/awards"],
-      ["/index.php/compare", "/compare"],
+      /* `/compare` хуудас байхгүй — харьцуулалтын хүснэгт `/models` дээр. */
+      ["/index.php/compare", "/models"],
       ["/index.php/dealer", "/contact"],
       ["/index.php/contact-us", "/contact"],
       ["/index.php/about-us", "/brand"],
@@ -109,7 +121,8 @@ const nextConfig: NextConfig = {
     const html: Array<[string, string]> = [
       ["/brand.html", "/brand"],
       ["/awards.html", "/awards"],
-      ["/compare.html", "/compare"],
+      ["/compare.html", "/models"],
+      ["/compare", "/models"],
       ["/service.html", "/service"],
       ["/contact.html", "/contact"],
       ["/news.html", "/news"],
@@ -127,4 +140,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

@@ -463,7 +463,7 @@ html.menu-open { overflow: hidden; }
    уян тул дунд багана нь ХАЖУУГИЙН АГУУЛГЫН ӨРГӨНӨӨС ҮЛ ХАМААРАН
    яг төвд суудаг. `margin-left: auto`-оор хийвэл цэс нь тэмдэг ба
    товчны өргөний зөрүүгээр хазайдаг. */
-@media (min-width: 1000px) {
+@media (min-width: 1200px) {
   /* ⚠ ЗАВСАР ТОГТМОЛ 24px БАЙСАН. Хэрэглэгчийн дэлгэцээс
      баригдсан: тэмдэг ба цэсний хооронд ердөө ~4px үлдэж,
      «CHERY» нь «Загварууд»-тай наалдаж байв.
@@ -567,7 +567,7 @@ html.menu-open { overflow: hidden; }
    88px өндөр нь 900px кадрын 10%-ийг эзэлж, тунгалаг байсан ч
    жинтэй мэдрэгдэж байв. 76px нь тэмдэг, цэс, үйлдэл гурвыг
    чөлөөтэй багтаасаар байна. */
-@media (min-width: 1000px) { .nav--hero { --nav-hero-h: 76px; } }
+@media (min-width: 1200px) { .nav--hero { --nav-hero-h: 76px; } }
 
 /* Тод тэнгэр дээр цагаан бичвэр 2:1 контрасттай болж уншигдахгүй
    байсан. Бүтэн харлуулахын оронд НАРИЙХАН дээд налуу — тэнгэр тод
@@ -615,13 +615,13 @@ html.menu-open { overflow: hidden; }
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
-@media (max-width: 999px) {
+@media (max-width: 1199.98px) {
   .nav--hero.is-stuck {
     -webkit-backdrop-filter: none; backdrop-filter: none;
     background: rgba(12,12,14,.94);
   }
 }
-@media (min-width: 1000px) { .nav--hero.is-stuck { --nav-hero-h: 66px; } }
+@media (min-width: 1200px) { .nav--hero.is-stuck { --nav-hero-h: 66px; } }
 
 /* `backdrop-filter` дэмжихгүй хөтөч (хуучин Firefox тохиргоо) —
    тунгалаг үлдвэл цагаан агуулга дээр цагаан бичвэр уншигдахгүй.
@@ -722,34 +722,29 @@ html.menu-open { overflow: hidden; }
   .nav .nav__cta:hover svg { transform: none; }
 }
 
-/* ---------- ХЭВТЭЭ ЦЭС — 1220px-ЭЭС ----------
-   Desktop-д бургер цэс ГАРАХГҮЙ. Өмнө хязгаар 1340px байсан тул
-   1280px CSS өргөнтэй компьютер (1920px дэлгэц + Windows-ын 150%
-   масштаб) дээр утасны цэс гарч байв.
+/* ---------- ХЭВТЭЭ ЦЭС — 1200px-ЭЭС ----------
+   ⚠ ХЭЛ СОНГОГЧ («MN / EN») НЭМЭГДЭЖ ХЯЗГААР 1000 → 1200px БОЛОВ.
+   Монгол цэсний таван бүлэг нь толгойг аль хэдийн дүүргэж байсан
+   (аудитын M6); 64px-ийн сонгогч нэмэхэд 1000–1199px-д 34–97px
+   халиж байсныг хэмжив. Шахаж багтаахын оронд тэр өргөнд (tablet
+   landscape) бургер цэс гарна — премиум автомашины сайтуудын ердийн
+   хязгаар. 1280px CSS өргөнтэй компьютер (1920px + 150% масштаб)
+   хэвтээ цэстэй хэвээр.
 
-   ⚙ ЯАГААД 1340 БАЙСНЫГ ХЭРХЭН ШИЙДСЭН: 1340 нь зайнаас гарсан
-   хязгаар байсан — 48px завсартай үед цэс + дугаар + товч нь
-   1223px шаарддаг. Завсрыг 24px болгоход шаардлага 1111px болж,
-   1220px-д 11px нөөцтэй ШАХАЛТГҮЙ багтана (Chrome-оор хэмжив:
-   1220px → links 469px, товч 230px — хоёулаа бүтэн хэмжээндээ).
-   48px завсартай үед 1280px-д товч 230→187px шахагдаж бичвэр
-   хуваагдаж байсныг мөн хэмжилтээр тогтоов.
+   ⚠ УТАСНЫ ДУГААР DESKTOP-ИЙН ТОЛГОЙД ГАРАХГҮЙ. Контейнер 1240px-ээс
+   өргөсдөггүй тул дугаар (≈130px) аль ч өргөнд Монгол цэстэй
+   багтахгүй байв. Hero толгой нь аль хэдийн дугааргүй байсан тул
+   одоо БҮХ хуудас нэг ижил. Дугаар нь мобайл цэс, хөл, «Холбоо
+   барих» хуудас, шоурумын хэсэгт хэвээр. */
 
-   Тиймээс завсрыг ХЯЗГААРААС ХАМААРУУЛЖ хоёр шатлав. */
-/* ── Шатлал 1 · 1000px-ЭЭС — хэвтээ цэс, НЯГТ хувилбар ──
-   Хэмжсэн (Chrome, /models/): лого 216 + цэс 430 + товч 189 +
-   завсар 2×20 = 875px. 1000px-д контейнер 920px → 45px нөөц.
-   960px-д ердөө 8px нөөц тул хязгаарыг 1000px-д барив.
-
-   Нягтруулах гурван арга (тус бүр хэмжигдсэн):
-     · лого 26px → 22px  (өргөн 246 → 216)
-     · цэсний фонт 15px → 14px  (өргөн 509 → 430)
-     · товчны хажуугийн зай 32px → 22px  (өргөн 230 → 189)
-   Дугаар нь энэ шатлалд БАЙХГҮЙ — 1080px-ээс орж ирнэ (доор). */
-@media (min-width: 1000px) {
-  .nav__in { gap: 20px; }
-  .nav__links { display: flex; gap: 18px; }
+/* ── Шатлал 1 · 1200–1439px — НЯГТ ──
+   Хэмжсэн (Монгол, хамгийн урт): лого 216 + цэс 541 + сонгогч 64 +
+   товч 170 + завсар ≈ 1040px; 1200px-д контейнер ≈ 1118px. */
+@media (min-width: 1200px) {
+  .nav__in { gap: var(--s-4); }
+  .nav__links { display: flex; gap: 14px; }
   .nav__links a { font-size: 14px; }
+  .nav__links .nav__item > a { gap: 4px; }
   .nav .nav__cta {
     display: inline-flex; min-width: 170px; min-height: 46px;
     padding-inline: 20px; font-size: 13.5px;
@@ -757,71 +752,52 @@ html.menu-open { overflow: hidden; }
   .burger { display: none; }
   .nav__brand img { height: 22px; }
   .nav__brand .nav__chery { height: 14px; }
-  /* Дугаар нь 1000–1079px-д толгойд БАГТАХГҮЙ: оруулбал товчны
-     бичвэр 189 → 176px шахагдаж хоёр мөр болно (хэмжсэн). Хөл ба
-     «Холбоо барих» хуудсанд бий тул мэдээлэл алдагдахгүй. */
   .nav__in .nav__phone { display: none; }
 }
 
-/* ── 1100px-ЭЭС — дугаар толгойд орж ирнэ ──
-   Хэмжсэн (nowrap-тай): шаардлага 978px, контейнер 1012px
-   → 34px нөөц. 1080px-д ердөө 16px байсан тул өөр системийн
-   фонтын өргөний зөрүүг даахгүй — хязгаарыг дээшлүүлэв. */
-/* Hero дээрх тунгалаг толгой 1000–1199px-д: лого, цэс, CTA хоорондоо
-   наалдаж байсан (1024-д хэмжсэн). */
-@media (min-width: 1000px) and (max-width: 1199.98px) {
-  .nav--hero .nav__in { gap: var(--s-5); }
-  .nav--hero .nav__links { gap: 14px; }
-  .nav--hero .nav__links a { font-size: 13.5px; }
-  .nav.nav--hero .nav__cta { font-size: 13.5px; }
-  .nav--hero .nav__brand img { height: 19px; }
-  .nav--hero .nav__brand .nav__chery { height: 12px; }
-}
-
-/* 1000–1259px: дэд цэстэй 5 бүлэг багтахын тулд нягтруулна
-   (1024-д 18px халиж байсныг хэмжсэн). */
-@media (min-width: 1000px) and (max-width: 1259.98px) {
-  .nav__in { gap: var(--s-4); }
-  .nav__links { gap: 14px; }
-  .nav__links a { font-size: 14px; }
-  .nav__links .nav__item > a { gap: 4px; }
-}
-@media (min-width: 1000px) and (max-width: 1099.98px) {
-  .nav .nav__cta { min-width: 0; padding-inline: 16px; }
-  .nav .nav__cta svg { display: none; }
-}
-
-/* Цэс «Chery-ийн тухай», «Худалдан авалт»-аар өргөссөн тул дугаар
-   1440px-ээс л толгойд орно (1280-д 8px халиж байсныг хэмжсэн). */
+/* ── Шатлал 2 · 1440px-ЭЭС — бүтэн хэмжээ ──
+   Лого 24px, цэс 16px («Navigation Medium 16px»), товч 190×48.
+   Хэмжсэн: ≈ 1197px, контейнер 1240px. */
 @media (min-width: 1440px) {
-  .nav__in .nav__phone {
-    display: inline-flex; margin-left: 0; font-size: 14px;
-  }
-}
-
-/* ── Шатлал 2 · 1220px-ЭЭС — бүтэн хэмжээ ──
-   Нягтруулалт цуцлагдана: лого, фонт, товч бүгд хэвийн болно.
-   Хэмжсэн (nowrap-тай): шаардлага 1109px. 1220px-д нөөц 13px
-   байсан тул 1260px болгов — тэнд 50px нөөцтэй. */
-@media (min-width: 1260px) {
   .nav__in { gap: var(--s-5); }
   .nav__links { gap: 22px; }
-  /* Цэсний шошго 16px — макетын «Navigation Medium 16px». */
   .nav__links a { font-size: 16px; }
-  /* ⚠ ӨМНӨ 224×54 БАЙСАН. Тэр хэмжээ нь баруун талыг хүндрүүлж,
-     тунгалаг толгойн «хөвж яваа» мэдрэмжийг дардаг байв.
-     190×48 нь ижил уншигдацтай боловч хамаагүй чимээгүй —
-     улаан нь өргөлт хэвээр, давамгайлал биш. */
   .nav .nav__cta { min-width: 190px; min-height: 48px; padding-inline: var(--s-5); font-size: 14px; }
   .nav__brand img { height: 24px; }
   .nav__brand .nav__chery { height: 15px; }
-  .nav__in .nav__phone { font-size: var(--fs-small); }
 }
 
-/* ── Шатлал 3 · 1440px-ЭЭС — зай тайван болно (нөөц 65px) ── */
-@media (min-width: 1440px) {
-  .nav__in { gap: var(--s-6); }
-  .nav__links { gap: var(--s-6); }
+/* ---------- 6в. ХЭЛ СОНГОГЧ — «MN / EN» ----------
+   Товч биш, хайрцаг биш — цэсний бичвэртэй НЭГ хэл: жижиг, зайтай
+   том үсэг, идэвхтэй нь бүтэн, нөгөө нь бүдэг. Толгойн минимал
+   байдлыг эвдэхгүй. Хүрэх талбай 44px. Desktop-д толгойд, 1200px-ээс
+   доош бургер цэсний дээд мөрөнд бүтэн нэрээр («Монгол / English»).
+   Өргөн нь агуулгаараа (тогтмол px биш) — хэл солиход үсрэхгүй. */
+.lang {
+  display: none; align-items: center;
+  font-size: 13px; font-weight: 600; letter-spacing: .06em;
+  white-space: nowrap; color: var(--c-ink);
+}
+.lang__item { display: inline-flex; align-items: center; }
+.lang__sep { padding-inline: 6px; opacity: .3; font-weight: 400; }
+.lang__opt {
+  display: inline-flex; align-items: center; min-height: 44px;
+  color: inherit; text-decoration: none; opacity: .5;
+  transition: opacity 180ms var(--ease);
+}
+.lang__opt[aria-current] { opacity: 1; }
+a.lang__opt:hover, a.lang__opt:focus-visible { opacity: 1; }
+@media (min-width: 1200px) { .nav__end > .lang { display: inline-flex; } }
+.nav--hero .lang, .t-dark .lang { color: #fff; }
+
+.burger__panel .lang--full {
+  display: flex; letter-spacing: 0; font-size: 15px;
+  margin-bottom: var(--s-1); border-bottom: 1px solid var(--c-line);
+}
+.burger__panel .lang--full a.lang__opt,
+.burger__panel .lang--full .lang__opt {
+  min-height: 44px; border-bottom: 0;
+  font-size: 15px; font-weight: 600; color: var(--c-ink);
 }
 
 /* ---------- 7. ГАРЫН ҮСЭГ №1 — КИНО HERO ----------
@@ -1802,7 +1778,8 @@ html.menu-open { overflow: hidden; }
   margin: 6px 0 0;
   font-family: var(--font-display);
   font-size: clamp(2.6rem, 4.4vw, 4.25rem);
-  font-weight: 600; letter-spacing: -.035em; line-height: .98;
+  /* 600 → 500: том загварын нэр жингээрээ биш, хэмжээгээрээ давамгайлна */
+  font-weight: 500; letter-spacing: -.035em; line-height: .98;
   color: #fff;
 }
 .mh__tagline { margin: 10px 0 0; font-size: clamp(1rem, 1.3vw, 1.125rem); color: rgba(255,255,255,.82); letter-spacing: -.01em; }
@@ -2919,7 +2896,7 @@ html.menu-open { overflow: hidden; }
   margin: 0;
   font-size: clamp(2.75rem, 6vw, 5rem);
   font-family: var(--font-display);
-  font-weight: 600; letter-spacing: -.035em; line-height: .98;
+  font-weight: 500; letter-spacing: -.035em; line-height: .98;
   color: var(--c-ink);
 }
 
@@ -3634,3 +3611,9 @@ html.menu-open { overflow: hidden; }
   .brandmark__base { transition: none; }
   .brandmark__draw { animation: none; stroke-dashoffset: 0; }
 }
+
+/* ---------- Үйлчилгээ: баталгааны хамрах хүрээ, FAQ хариулт ----------
+   Өмнө inline `style` байсан — хэл бүрд ижил тул нэг газар. */
+.cover__t { border-top: 1px solid rgba(255, 255, 255, .28); padding-top: var(--s-5); }
+.cover__b { margin-top: var(--s-3); }
+.faq__a { padding-bottom: var(--s-5); max-width: 70ch; }

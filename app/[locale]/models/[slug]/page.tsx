@@ -1,77 +1,84 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import Pic from "@/components/Pic";
 import { Arrow, Head, CtaSection } from "@/components/blocks";
-import { site, models, awards, keySpecs, type Model } from "@/lib/content";
+import { MODEL_IDS, getContent, keySpecs } from "@/lib/content";
 import { mnt } from "@/lib/format";
-import { leadHref } from "@/lib/routes";
+import { alternates, localePath, ogBase, type Locale } from "@/lib/i18n";
+import { leadHref, modelHref } from "@/lib/routes";
 import { carJsonLd } from "@/lib/jsonld";
 
 /* ══════════════════════════════════════════════════════════════
-   ЗАГВАРЫН ХУУДАС — НЭГ ШАБЛОН, ДӨРВӨН ХУУДАС
-
-   ⚙ Өмнө `build.mjs` нь дөрвөн тусдаа `.html` файл үүсгэдэг байв.
-   Одоо `generateStaticParams` нь build-time дээр дөрвүүлээ static
-   болгоно — гаралт ижил (урьдчилан үүсгэсэн HTML), эх код нь нэг.
+   ЗАГВАРЫН ХУУДАС — НЭГ ШАБЛОН, ДӨРВӨН ЗАГВАР, ХОЁР ХЭЛ.
+   `generateStaticParams` нь build-time дээр бүгдийг static болгоно.
    ══════════════════════════════════════════════════════════════ */
 
 export function generateStaticParams() {
-  return models.map((m) => ({ slug: m.id }));
+  return MODEL_IDS.map((slug) => ({ slug }));
 }
 
 /* Динамик хаяг байхгүй — зөвхөн дөрвөн загвар. Танигдаагүй бол 404. */
 export const dynamicParams = false;
 
-function find(slug: string): Model | undefined {
-  return models.find((m) => m.id === slug);
+type Props = { params: Promise<{ locale: Locale; slug: string }> };
+
+function find(locale: Locale, slug: string) {
+  return getContent(locale).models.find((m) => m.id === slug);
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
-  const { slug } = await params;
-  const m = find(slug);
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale, slug } = await params;
+  const m = find(locale, slug);
   if (!m) return {};
+  const t = await getTranslations({ locale, namespace: "model" });
   /* «Chery Tiggo 8 Монгол | Үнэ, үзүүлэлт | Sain Motors» — хайлтад
      хүмүүсийн бичдэг үгсээр; layout-ийн загварыг дарна (`absolute`). */
-  const title = `Chery ${m.name} Монгол | Үнэ, үзүүлэлт | Sain Motors`;
+  const title = t("title", { name: m.name });
+  const path = modelHref(m.id);
   return {
     title: { absolute: title },
     description: `CHERY ${m.name}. ${m.lede}`,
-    alternates: { canonical: `/models/${m.id}` },
+    alternates: alternates(locale, path),
     openGraph: {
+      ...ogBase(locale),
       title,
       description: m.lede,
-      url: `/models/${m.id}`,
+      url: localePath(locale, path),
+      images: [{ url: `/assets/img/${m.card}.webp`, alt: `CHERY ${m.name}` }],
     },
   };
 }
 
-export default async function ModelPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
-  const { slug } = await params;
-  const m = find(slug);
+export default async function ModelPage({ params }: Props) {
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
+  const m = find(locale, slug);
   if (!m) notFound();
+
+  const t = await getTranslations();
+  const { site, awards } = getContent(locale);
+  const href = (p: string) => localePath(locale, p);
+  const path = modelHref(m.id);
 
   const hasDims = (m.panels ?? []).some((p) => p.dims);
   const aw = awards.byModel.find((a) => a.id === m.id);
   const firstColor = m.colors[0];
+  const specs = keySpecs(m);
+  /* MN: «Цагаан (Khaki White)», EN: будгийн нэр л («Khaki White») */
+  const colorLabel = (c: (typeof m.colors)[number]) =>
+    locale === "mn" ? { main: c.name, sub: c.paint } : { main: c.paint, sub: "" };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJsonLd(m)) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(carJsonLd(m, locale)) }}
       />
-      <Nav active="/models" />
+      <Nav active="/models" path={path} />
       <main id="main">
         {/* ---------- HERO ---------- */}
         <section className="hero hero--model">
@@ -80,27 +87,14 @@ export default async function ModelPage({
               <picture>
                 {m.heroTall ? (
                   <>
-                    <source
-                      media="(max-width: 767px)"
-                      srcSet={`/assets/img/${m.heroTall}.avif`}
-                      type="image/avif"
-                    />
-                    <source
-                      media="(max-width: 767px)"
-                      srcSet={`/assets/img/${m.heroTall}.webp`}
-                      type="image/webp"
-                    />
+                    <source media="(max-width: 767px)" srcSet={`/assets/img/${m.heroTall}.avif`} type="image/avif" />
+                    <source media="(max-width: 767px)" srcSet={`/assets/img/${m.heroTall}.webp`} type="image/webp" />
                   </>
                 ) : null}
-                <source
-                  srcSet={`/assets/img/${m.hero}.avif`}
-                  type="image/avif"
-                  sizes="100vw"
-                />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <source srcSet={`/assets/img/${m.hero}.avif`} type="image/avif" />
                 <img
                   src={`/assets/img/${m.hero}.webp`}
-                  alt={`CHERY ${m.name} — гадна тал`}
+                  alt={t("common.exterior", { model: m.name })}
                   fetchPriority="high"
                 />
               </picture>
@@ -111,15 +105,16 @@ export default async function ModelPage({
                 {/* Эхний дэлгэцэд: загвар · байр суурь · үнэ · гол үзүүлэлт ·
                     дараагийн алхам. Анхдагч НЭГ (улаан), хоёрдогч нэг. */}
                 <div className="hero__copy mh">
-                  <p className="meta">{m.segment}</p>
+                  <p className="meta">{t(`models.segment.${m.segment}`)}</p>
                   <h1 className="mh__name">{m.name}</h1>
                   <p className="mh__tagline">{m.tagline}</p>
                   <p className="mh__price">
                     {m.price ? (
                       <>
                         <span className="mh__amount">
-                          {mnt(m.price.from)}-аас
-                          {m.price.to ? ` · ${mnt(m.price.to)} хүртэл` : ""}
+                          {m.price.to
+                            ? t("price.range", { from: mnt(m.price.from, locale), to: mnt(m.price.to, locale) })
+                            : t("price.from", { price: mnt(m.price.from, locale) })}
                         </span>
                         <span className="mh__note">{m.price.note}</span>
                       </>
@@ -127,29 +122,26 @@ export default async function ModelPage({
                       <span className="mh__amount mh__amount--ask">{m.priceNote}</span>
                     )}
                   </p>
-                  {keySpecs(m).length ? (
-                    <dl
-                      className="mh__specs"
-                      style={{ "--n": keySpecs(m).length } as React.CSSProperties}
-                    >
-                      {keySpecs(m).map(([k, v]) => (
+                  {specs.length ? (
+                    <dl className="mh__specs" style={{ "--n": specs.length } as React.CSSProperties}>
+                      {specs.map(({ k, v }) => (
                         <div key={k}>
-                          <dt>{k}</dt>
-                          <dd>{v}</dd>
+                          <dt>{t(`specs.short.${k}`)}</dt>
+                          <dd>{k === "power" ? `${v} ${t("specs.hp")}` : v}</dd>
                         </div>
                       ))}
                     </dl>
                   ) : null}
                   <div className="btn-row">
-                    <a className="btn btn--primary" href={leadHref("test-drive", m.id)}>
-                      Тест драйв захиалах
+                    <a className="btn btn--primary" href={href(leadHref("test-drive", m.id))}>
+                      {t("common.testDrive")}
                     </a>
-                    <a className="btn btn--secondary" href={leadHref("quote", m.id)}>
-                      Үнийн санал авах
+                    <a className="btn btn--secondary" href={href(leadHref("quote", m.id))}>
+                      {t("common.quote")}
                     </a>
                   </div>
                   <a className="link mh__all" href="#үзүүлэлт">
-                    Бүх үзүүлэлт <Arrow />
+                    {t("model.allSpecs")} <Arrow />
                   </a>
                 </div>
               </div>
@@ -163,40 +155,21 @@ export default async function ModelPage({
           </div>
         </section>
 
-        {/* ---------- Бүтэн дэлгэцийн хэсгүүд ----------
-            Зураг бүтэн дэлгэцийг эзэлж, мэдээлэл дээр давхарлана.
-            `dims` байвал хэмжээг шугамаар тэмдэглэнэ. */}
+        {/* ---------- Бүтэн дэлгэцийн хэсгүүд ---------- */}
         {(m.panels ?? []).map((p, k) => (
-          <section
-            key={p.img}
-            className={p.dims ? "panel panel--dims" : "panel"}
-            id={p.eyebrow.toLowerCase()}
-          >
+          <section key={p.img} className={p.dims ? "panel panel--dims" : "panel"} id={p.id}>
             <div className="panel__media">
               <picture>
                 {p.imgTall ? (
                   <>
-                    <source
-                      media="(max-width: 767px)"
-                      srcSet={`/assets/img/${p.imgTall}.avif`}
-                      type="image/avif"
-                    />
-                    <source
-                      media="(max-width: 767px)"
-                      srcSet={`/assets/img/${p.imgTall}.webp`}
-                      type="image/webp"
-                    />
+                    <source media="(max-width: 767px)" srcSet={`/assets/img/${p.imgTall}.avif`} type="image/avif" />
+                    <source media="(max-width: 767px)" srcSet={`/assets/img/${p.imgTall}.webp`} type="image/webp" />
                   </>
                 ) : null}
-                <source
-                  srcSet={`/assets/img/${p.img}.avif`}
-                  type="image/avif"
-                  sizes="100vw"
-                />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <source srcSet={`/assets/img/${p.img}.avif`} type="image/avif" />
                 <img
                   src={`/assets/img/${p.img}.webp`}
-                  alt={`CHERY ${m.name} — ${p.title || p.eyebrow}`}
+                  alt={`CHERY ${m.name} — ${p.title}`}
                   {...(k === 0
                     ? { loading: "eager" as const, fetchPriority: "low" as const }
                     : { loading: "lazy" as const })}
@@ -208,14 +181,14 @@ export default async function ModelPage({
             <div className="panel__body">
               <div className="container">
                 <p className="meta panel__eyebrow">{p.eyebrow}</p>
-                {p.title ? <h2 className="h2 panel__title">{p.title}</h2> : null}
+                <h2 className="h2 panel__title">{p.title}</h2>
                 {p.body ? <p className="panel__text">{p.body}</p> : null}
                 {p.dims ? (
                   <>
                     <dl className="dims">
-                      {p.dims.map(([v, l]) => (
-                        <div className="dims__i" key={l}>
-                          <dt className="dims__l">{l}</dt>
+                      {p.dims.map(([v, d]) => (
+                        <div className="dims__i" key={d}>
+                          <dt className="dims__l">{t(`specs.dims.${d}`)}</dt>
                           <dd className="dims__v num">{v}</dd>
                         </div>
                       ))}
@@ -233,10 +206,13 @@ export default async function ModelPage({
           <section className="section section--tight">
             <div className="container">
               <div className="figures reveal">
-                {m.figures.map(([k, l]) => (
-                  <div className="figure" key={l}>
-                    <div className="figure__k">{k}</div>
-                    <div className="figure__l">{l}</div>
+                {m.figures.map((f) => (
+                  <div className="figure" key={f.k}>
+                    <div className="figure__k">{f.v}</div>
+                    <div className="figure__l">
+                      {t(`specs.rows.${f.k}`)}
+                      {f.note ? ` · ${f.note}` : ""}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -250,13 +226,13 @@ export default async function ModelPage({
             <div className="container">
               <div className="award-strip reveal">
                 <div>
-                  <p className="meta">Олон улсын үнэлгээ</p>
+                  <p className="meta">{t("model.awardsEyebrow")}</p>
                   <p className="h3" style={{ marginTop: "var(--s-2)" }}>
                     {aw.list[0]}
                   </p>
                 </div>
-                <a className="link" href={`/awards#${m.id}`}>
-                  {m.name}-ийн бүх шагнал <Arrow />
+                <a className="link" href={href(`/awards#${m.id}`)}>
+                  {t("model.allAwards", { gen: m.gen })} <Arrow />
                 </a>
               </div>
             </div>
@@ -266,7 +242,7 @@ export default async function ModelPage({
         {/* ---------- Наалдмал өгүүлэмж ---------- */}
         <section className="section">
           <div className="container">
-            <Head eyebrow="Онцлог" title="Гол шийдлүүд" />
+            <Head eyebrow={t("model.storyEyebrow")} title={t("model.storyTitle")} />
             <div className="story" data-story>
               <div className="story__media">
                 <div className="story__pic">
@@ -285,13 +261,9 @@ export default async function ModelPage({
               </div>
               <div className="story__items">
                 {m.story.map((s) => (
-                  <div className="story__item" key={s.title}>
+                  <div className="story__item" key={s.img}>
                     <div className="story__item-pic">
-                      <Pic
-                        name={s.img}
-                        alt={`CHERY ${m.name} — ${s.title}`}
-                        sizes="92vw"
-                      />
+                      <Pic name={s.img} alt={`CHERY ${m.name} — ${s.title}`} sizes="92vw" />
                     </div>
                     <p className="meta">{s.eyebrow}</p>
                     <h3 className="h3">{s.title}</h3>
@@ -306,7 +278,7 @@ export default async function ModelPage({
         {m.gallery ? (
           <section className="section section--surface section--tight">
             <div className="container">
-              <Head eyebrow="Галерей" title="Гадна ба дотоод орчин" />
+              <Head eyebrow={t("model.galleryEyebrow")} title={t("model.galleryTitle")} />
               <div className="strip">
                 {m.gallery.map((g) => (
                   <figure key={g}>
@@ -327,7 +299,7 @@ export default async function ModelPage({
                 <img
                   key={c.img}
                   src={`/assets/img/${c.img}.webp`}
-                  alt={`CHERY ${m.name} — ${c.name} (${c.en})`}
+                  alt={`CHERY ${m.name} — ${c.paint}`}
                   {...(k === 0 ? { "data-shown": "" } : {})}
                   loading="lazy"
                   decoding="async"
@@ -335,38 +307,41 @@ export default async function ModelPage({
               ))}
             </div>
             <div className="head reveal" style={{ marginBottom: 0 }}>
-              <p className="meta">Биеийн өнгө</p>
-              <h2 className="h2">Өөрийн өнгийг сонго</h2>
-              <div className="swatches" role="group" aria-label="Биеийн өнгө сонгох">
-                {m.colors.map((c, k) => (
-                  <button
-                    key={c.hex}
-                    className="swatch"
-                    type="button"
-                    aria-pressed={k === 0}
-                    data-mn={c.name}
-                    data-en={c.en}
-                    aria-label={`${c.name} — ${c.en}`}
-                  >
-                    <span style={{ background: c.hex }} />
-                  </button>
-                ))}
+              <p className="meta">{t("model.colorsEyebrow")}</p>
+              <h2 className="h2">{t("model.colorsTitle")}</h2>
+              <div className="swatches" role="group" aria-label={t("model.colorsGroup")}>
+                {m.colors.map((c, k) => {
+                  const lbl = colorLabel(c);
+                  return (
+                    <button
+                      key={c.hex}
+                      className="swatch"
+                      type="button"
+                      aria-pressed={k === 0}
+                      data-main={lbl.main}
+                      data-sub={lbl.sub}
+                      aria-label={lbl.sub ? `${lbl.main} — ${lbl.sub}` : lbl.main}
+                    >
+                      <span style={{ background: c.hex }} />
+                    </button>
+                  );
+                })}
               </div>
               {firstColor ? (
-                <p className="swatch-name">
-                  {firstColor.name} <span>({firstColor.en})</span>
+                <p className="swatch-name" aria-live="polite">
+                  {colorLabel(firstColor).main}
+                  {colorLabel(firstColor).sub ? <span> ({colorLabel(firstColor).sub})</span> : null}
                 </p>
               ) : null}
             </div>
           </div>
         </section>
 
-        {/* ---------- Татах ----------
-            `download` атрибут нь хөтөч дээр нээхийн оронд хадгалуулна. */}
+        {/* ---------- Татах ---------- */}
         {m.brochure ? (
           <section className="section section--tight" id="татах">
             <div className="container">
-              <Head eyebrow="Татах" title="Брошюр ба үнийн хуудас" />
+              <Head eyebrow={t("model.downloadEyebrow")} title={t("model.downloadTitle")} />
               <a className="dl reveal" href={m.brochure.href} download>
                 <span className="dl__doc" aria-hidden="true">
                   PDF
@@ -376,7 +351,7 @@ export default async function ModelPage({
                   <span className="dl__meta">{m.brochure.note}</span>
                 </span>
                 <span className="dl__act">
-                  Татах <Arrow />
+                  {t("common.download")} <Arrow />
                 </span>
               </a>
             </div>
@@ -388,23 +363,20 @@ export default async function ModelPage({
           {m.specs ? (
             <section className="section section--surface">
               <div className="container">
-                <Head
-                  eyebrow="Үзүүлэлт"
-                  title="Бүрэн техник үзүүлэлт"
-                  body="Хэсэг бүрийг дарж дэлгэнэ."
-                />
+                <Head eyebrow={t("model.specsEyebrow")} title={t("model.specsTitle")} body={t("model.specsHint")} />
                 <div className="spec">
                   {m.specs.map((g) => (
-                    <details className="spec__group" key={g.group}>
-                      <summary>{g.group}</summary>
+                    <details className="spec__group" key={g.g}>
+                      <summary>{t(`specs.groups.${g.g}`)}</summary>
                       {g.rows ? (
                         <table className="spec__table">
                           {g.cols ? (
                             <thead>
                               <tr>
-                                {g.cols.map((c) => (
-                                  <th scope="col" key={c}>
-                                    {c}
+                                <th scope="col">{t("specs.column")}</th>
+                                {g.cols.map((col) => (
+                                  <th scope="col" key={col}>
+                                    {col}
                                   </th>
                                 ))}
                               </tr>
@@ -412,9 +384,9 @@ export default async function ModelPage({
                           ) : null}
                           <tbody>
                             {g.rows.map((r) => (
-                              <tr key={r[0]}>
-                                <th scope="row">{r[0]}</th>
-                                {r.slice(1).map((v, i) => (
+                              <tr key={r.k}>
+                                <th scope="row">{t(`specs.rows.${r.k}`)}</th>
+                                {r.v.map((v, i) => (
                                   <td key={i}>{v}</td>
                                 ))}
                               </tr>
@@ -436,11 +408,11 @@ export default async function ModelPage({
           ) : (
             <section className="section section--surface">
               <div className="container">
-                <Head eyebrow="Үзүүлэлт" title="Баталгаажуулж байна" />
+                <Head eyebrow={t("model.specsEyebrow")} title={t("model.specsPending")} />
                 <p className="note">{m.specsNote}</p>
                 <div className="btn-row" style={{ marginTop: "var(--s-6)" }}>
-                  <a className="btn btn--secondary" href={leadHref("quote", m.id)}>
-                    Үнийн санал авах
+                  <a className="btn btn--secondary" href={href(leadHref("quote", m.id))}>
+                    {t("common.quote")}
                   </a>
                   <a className="btn btn--secondary" href={site.phoneHref}>
                     {site.phone}
@@ -454,18 +426,13 @@ export default async function ModelPage({
         <section className="section section--ink section--tight">
           <div className="container split">
             <div className="head reveal" style={{ marginBottom: 0 }}>
-              <p className="meta">Албан ёсны үйлдвэрийн баталгаа</p>
-              <h2 className="h2">
-                {site.warranty.years} эсвэл {site.warranty.km}
-              </h2>
-              <p className="body">
-                Хөдөлгүүр, хурдны хайрцаг, цахилгаан болон механик эд ангиудын
-                үйлдвэрийн согогийг бүрэн хариуцна.
-              </p>
+              <p className="meta">{t("model.warrantyEyebrow")}</p>
+              <h2 className="h2">{t("common.warrantyLine", { years: site.warranty.years, km: site.warranty.km })}</h2>
+              <p className="body">{t("model.warrantyBody")}</p>
             </div>
             <div className="reveal">
-              <a className="btn btn--secondary" href="/service">
-                Баталгааны нөхцөл <Arrow />
+              <a className="btn btn--secondary" href={href("/service")}>
+                {t("model.warrantyLink")} <Arrow />
               </a>
             </div>
           </div>
@@ -473,14 +440,13 @@ export default async function ModelPage({
 
         <CtaSection />
       </main>
-      {/* Мобайл: hero-г өнгөрмөгц доод талд хоёр үйлдэл (`site.js` §13).
-          Hero дотор аль хэдийн товч байгаа тул тэнд харагдахгүй. */}
-      <div className="mcta" data-mcta aria-label={`CHERY ${m.name} — үйлдэл`} role="region">
-        <a className="btn btn--secondary" href={leadHref("quote", m.id)}>
-          Үнийн санал
+      {/* Мобайл: hero-г өнгөрмөгц доод талд хоёр үйлдэл (`site.js` §13). */}
+      <div className="mcta" data-mcta aria-label={t("model.actions", { name: m.name })} role="region">
+        <a className="btn btn--secondary" href={href(leadHref("quote", m.id))}>
+          {t("common.quoteShort")}
         </a>
-        <a className="btn btn--primary" href={leadHref("test-drive", m.id)}>
-          Тест драйв
+        <a className="btn btn--primary" href={href(leadHref("test-drive", m.id))}>
+          {t("common.testDriveShort")}
         </a>
       </div>
       <Footer />

@@ -14,6 +14,7 @@
     "@supabase/supabase-js": "2.117.0",
     "motion": "^13.2.0",
     "next": "15.1.12",
+    "next-intl": "4.14.8",
     "react": "19.0.8",
     "react-dom": "19.0.8"
   },

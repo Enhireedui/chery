@@ -45,3 +45,6 @@ desktop.ini
 npm-debug.log*
 _*.html
 _hero-gen/
+
+# Supabase CLI local state (project ref, versions)
+supabase/.temp/

@@ -1,8 +1,11 @@
-import { site, faq, type Model } from "./content";
+import { getTranslations } from "next-intl/server";
+
+import { getContent, type Model } from "./content";
+import { localePath, type Locale } from "./i18n";
 import { abs } from "./site-url";
 
 /* ══════════════════════════════════════════════════════════════
-   Бүтэцлэгдсэн өгөгдөл (Phase 16)
+   Бүтэцлэгдсэн өгөгдөл — хуудасны хэлээр.
 
    ⚠ ХУУРАМЧ бүтэцлэгдсэн өгөгдөл БИЧИХГҮЙ. Тиймээс энд байхгүй:
      · `aggregateRating` — сайтад үнэлгээ цуглуулдаггүй
@@ -10,29 +13,26 @@ import { abs } from "./site-url";
      · `Product`-ийн `sku`, `gtin` — дугаар байхгүй
    Зөвхөн БАТАЛГААЖСАН баримт: хаяг, координат, цагийн хуваарь,
    үнэ (зарлагдсан загварт), FAQ (хуудсанд бодитоор байгаа).
-
-   Хаяг нь `abs()`-ээс — домэйн солиход өөрөө дагана.
    ══════════════════════════════════════════════════════════════ */
 
-export function dealerJsonLd() {
+export function dealerJsonLd(locale: Locale) {
+  const { site } = getContent(locale);
   return {
     "@context": "https://schema.org",
     "@type": "AutoDealer",
     name: `CHERY Mongolia — ${site.legal}`,
     description: site.role,
-    url: abs("/"),
+    url: abs(localePath(locale, "/")),
+    inLanguage: locale,
     telephone: "+976 7255-8855",
     address: {
       "@type": "PostalAddress",
       streetAddress: site.address.line1,
-      addressLocality: "Улаанбаатар",
+      addressLocality: site.address.locality,
       addressCountry: "MN",
     },
-    geo: {
-      "@type": "GeoCoordinates",
-      latitude: site.geo.lat,
-      longitude: site.geo.lng,
-    },
+    geo: { "@type": "GeoCoordinates", latitude: site.geo.lat, longitude: site.geo.lng },
+    hasMap: site.mapLink,
     openingHoursSpecification: [
       {
         "@type": "OpeningHoursSpecification",
@@ -40,12 +40,7 @@ export function dealerJsonLd() {
         opens: "09:00",
         closes: "21:00",
       },
-      {
-        "@type": "OpeningHoursSpecification",
-        dayOfWeek: ["Saturday"],
-        opens: "09:00",
-        closes: "19:00",
-      },
+      { "@type": "OpeningHoursSpecification", dayOfWeek: ["Saturday"], opens: "09:00", closes: "19:00" },
     ],
     brand: { "@type": "Brand", name: "CHERY" },
   };
@@ -53,13 +48,18 @@ export function dealerJsonLd() {
 
 /** Загварын хуудас. Үнэ зарлаагүй загварт `offers` ОРУУЛАХГҮЙ —
     тодорхойгүй үнийг зохиох нь хуурамч дохио. */
-export function carJsonLd(m: Model) {
+export function carJsonLd(m: Model, locale: Locale) {
+  const { site } = getContent(locale);
+  const url = abs(localePath(locale, `/models/${m.id}`));
   return {
     "@context": "https://schema.org",
     "@type": "Car",
     name: `CHERY ${m.name}`,
+    description: m.lede,
+    url,
+    image: abs(`/assets/img/${m.card}.webp`),
     brand: { "@type": "Brand", name: "CHERY" },
-    vehicleConfiguration: m.segment,
+    model: m.name,
     ...(m.price
       ? {
           offers: {
@@ -67,11 +67,8 @@ export function carJsonLd(m: Model) {
             price: m.price.from,
             priceCurrency: "MNT",
             availability: "https://schema.org/InStock",
-            url: abs(`/models/${m.id}`),
-            seller: {
-              "@type": "AutoDealer",
-              name: `CHERY Mongolia — ${site.legal}`,
-            },
+            url,
+            seller: { "@type": "AutoDealer", name: `CHERY Mongolia — ${site.legal}` },
           },
         }
       : {}),
@@ -80,11 +77,12 @@ export function carJsonLd(m: Model) {
 
 /** Үйлчилгээний хуудасны FAQ — асуулт, хариулт нь хуудсанд
     БОДИТООР харагдаж байгаа тул зөв (Google-ийн шаардлага). */
-export function faqJsonLd() {
+export function faqJsonLd(locale: Locale) {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: faq.map((f) => ({
+    inLanguage: locale,
+    mainEntity: getContent(locale).faq.map((f) => ({
       "@type": "Question",
       name: f.q,
       acceptedAnswer: { "@type": "Answer", text: f.a },
@@ -93,17 +91,18 @@ export function faqJsonLd() {
 }
 
 /** Шагналын хуудас. Бүх шагнал нь `content.ts`-д эх сурвалжтай. */
-export function awardsJsonLd() {
+export async function awardsJsonLd(locale: Locale) {
+  const t = await getTranslations({ locale, namespace: "awards.jsonld" });
   return {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "CHERY",
-    url: abs("/awards"),
+    url: abs(localePath(locale, "/awards")),
     award: [
       "Fortune Global 500 — #233 (2025)",
-      "Kantar BrandZ — авто ангиллын #1 (2024)",
+      t("kantar"),
       "J.D. Power Triple Crown — IQS, APEAL, SSI",
-      "22 дараалсан жил Хятадын экспортын тэргүүн",
+      t("exports"),
     ],
   };
 }

@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
+import { localePath } from "@/lib/i18n";
 import { getSupabaseAdmin } from "@/lib/supabase";
 
 /* ══════════════════════════════════════════════════════════════
@@ -9,7 +10,8 @@ import { getSupabaseAdmin } from "@/lib/supabase";
      · `site.js` (fetch, `Accept: application/json`) → JSON
        { ok: true } | { ok: false, error: "validation" | "rate" | "config" | "server" }
      · JS-гүй энгийн маягт → 303 redirect: амжилттай бол `/thanks`,
-       алдаа гарвал буцаад `/contact#захиалга`.
+       алдаа гарвал буцаад `/contact#захиалга` — маягтын `locale`
+       талбарын хэлээр (`/en/thanks`).
 
    Хамгаалалт (DB-ийн `check` хязгаарлалтын ӨМНӨХ давхарга):
      · honeypot `company` бөглөгдсөн бол чимээгүй «амжилттай» гэнэ
@@ -66,15 +68,16 @@ type LeadError = "validation" | "rate" | "config" | "server";
 export async function POST(req: NextRequest) {
   const wantsJson = (req.headers.get("accept") ?? "").includes("application/json");
 
+  let form: FormData | null = null;
   const reply = (error: LeadError | null, status: number) => {
     if (wantsJson) {
       return NextResponse.json(error ? { ok: false, error } : { ok: true }, { status });
     }
-    const to = error ? "/contact#захиалга" : "/thanks";
+    const locale = form?.get("locale") === "en" ? "en" : "mn";
+    const to = localePath(locale, error ? "/contact#захиалга" : "/thanks");
     return NextResponse.redirect(new URL(to, req.url), 303);
   };
 
-  let form: FormData;
   try {
     form = await req.formData();
   } catch {

@@ -1,40 +1,29 @@
+import { getI18n } from "@/lib/i18n-server";
+
 /* ══════════════════════════════════════════════════════════════
-   МЭДЭЭЛЭЛ АВАХ МОДАЛ — зөвхөн ХОЁР талбар: нэр ба утас.
+   ҮНИЙН САНАЛЫН МОДАЛ — зөвхөн ХОЁР талбар: нэр ба утас.
 
    Дилерийн лид авахад хангалттай — талбар бүр нэмэгдэх тутам
-   хөрвөлт унадаг. Загвар, зорилго, имэйл зэрэг нь «Холбоо барих»
+   хөрвөлт унадаг. Загвар, зорилго, имэйл нь «Холбоо барих»
    хуудасны бүтэн маягтад бий.
 
    Native `<dialog>`: Esc-ээр хаагдах, фокусын урхи, `::backdrop`,
    хаагдахад фокусыг товч руу эргүүлэх — бүгд хөтчийн дотоод зан
    төлөв тул JS-ээр гараар бичихгүй.
 
-   ⚙ JS АЖИЛЛАХГҮЙ БОЛ: товчны `href` хэвээр байгаа тул
-   `/contact#захиалга` руу орно. Модал нь зөвхөн ДАВХАРГА —
-   агуулга хаана ч алдагдахгүй.
+   ⚙ JS АЖИЛЛАХГҮЙ БОЛ: товчны `href` хэвээр тул маягт руу орно.
 
-   Далд `model` талбар: аль загварын кадр харагдаж байхад дарсныг
-   `site.js` бөглөнө. JS-гүй үед хоосон — хуурамч өгөгдөл үүсэхгүй.
-
-   ⚙ ЗАГВАР НЬ ХАРАГДАНА: далд талбар нь дилерт хүрдэг ч ХЭРЭГЛЭГЧ
-   өөрөө «аль машины тухай асууж байна» гэдгээ баталгаажуулах
-   ёстой. Тиймээс гарчгийн дээр загварын нэр гарна. Нэр нь
-   `hero__slide[data-name]`-аас ирнэ тул `lib/content.ts` цорын
-   ганц эх сурвалж хэвээр. JS ажиллаагүй эсвэл hero байхгүй
-   хуудсанд шошго нь «Захиалга» хэвээр — хоосон мөр гарахгүй.
-
-   ⚙ `purpose="advice"`: маягт нь ТЕСТ ДРАЙВ БИШ, мэдээлэл авах
-   хүсэлт болов. `leads_purpose_ok` хязгаарлалт нь
-   ('test-drive','quote','advice') гурвыг зөвшөөрдөг тул
-   миграц шаардахгүй. Тест драйвын бүтэн маягт нь «Холбоо
-   барих» хуудсанд ХЭВЭЭР байна.
+   Далд `model` талбар ба гарчгийн дээрх загварын нэрийг `site.js`
+   hero-гийн харагдаж буй кадраас бөглөнө; JS-гүй үед хоосон.
+   `purpose="quote"` — `leads_purpose_ok` хязгаарлалт нь
+   ('test-drive','quote','advice') гурвыг зөвшөөрдөг.
    ══════════════════════════════════════════════════════════════ */
-
-export default function LeadModal() {
+export default async function LeadModal() {
+  const { locale, t } = await getI18n();
   return (
     <dialog className="modal" id="lead-modal" aria-labelledby="lead-title">
       <div className="modal__box">
-        <button className="modal__x" type="button" data-modal-close aria-label="Хаах">
+        <button className="modal__x" type="button" data-modal-close aria-label={t("common.close")}>
           <svg
             width="18"
             height="18"
@@ -51,45 +40,24 @@ export default function LeadModal() {
 
         <form className="form form--lead" method="post" action="/api/lead">
           <p className="meta" data-lead-model-name>
-            Захиалга
+            {t("modal.tag")}
           </p>
-          {/* ⚠ `h3` → `h2` (аудитын §6). Модал нь DOM-д hero-гийн
-              дараа шууд сууна; `h1` → `h3` гэсэн түвшний алгасал
-              үүсгэж байв. Харагдац хэвээр — хэмжээг `.h3` анги
-              хэлнэ, шошгыг таг хэлнэ. */}
+          {/* `h2` (харагдац нь `.h3`) — hero-гийн дараа түвшний алгасалгүй. */}
           <h2 className="h3" id="lead-title">
-            Үнийн санал авах
+            {t("modal.title")}
           </h2>
-          <p className="body body--lead">
-            Нэр, утсаа үлдээгээрэй. Ажлын цагаар холбогдож үнэ, хувилбар,
-            бэлэн байдлын талаар дэлгэрэнгүй мэдээлэл өгнө.
-          </p>
+          <p className="body body--lead">{t("modal.body")}</p>
 
           <div className="field">
-            <label htmlFor="m-name">Нэр</label>
-            <input
-              id="m-name"
-              name="name"
-              type="text"
-              autoComplete="name"
-              required
-              autoFocus
-            />
+            <label htmlFor="m-name">{t("form.name")}</label>
+            <input id="m-name" name="name" type="text" autoComplete="name" required autoFocus />
           </div>
           <div className="field">
-            <label htmlFor="m-phone">Утас</label>
-            <input
-              id="m-phone"
-              name="phone"
-              type="tel"
-              autoComplete="tel"
-              inputMode="tel"
-              required
-            />
+            <label htmlFor="m-phone">{t("form.phone")}</label>
+            <input id="m-phone" name="phone" type="tel" autoComplete="tel" inputMode="tel" required />
           </div>
 
-          {/* Спам урхи — хүн харахгүй, автомат бөглөгч бөглөнө.
-              Сервер дээр бөглөгдсөн бол хүсэлтийг чимээгүй хаяна. */}
+          {/* Спам урхи — сервер дээр бөглөгдсөн бол чимээгүй хаяна. */}
           <input
             type="text"
             name="company"
@@ -102,9 +70,10 @@ export default function LeadModal() {
           <input type="hidden" name="purpose" value="quote" />
           <input type="hidden" name="model" data-lead-model value="" />
           <input type="hidden" name="source_path" data-lead-source value="" />
+          <input type="hidden" name="locale" value={locale} />
 
           <button className="btn btn--primary" type="submit">
-            Илгээх
+            {t("form.send")}
           </button>
         </form>
       </div>

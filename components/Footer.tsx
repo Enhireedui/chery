@@ -1,11 +1,13 @@
-import { site, footerGroups } from "@/lib/content";
 import BrandReveal from "@/components/BrandReveal";
+import { getI18n } from "@/lib/i18n-server";
 
 /* Хөл — SERVER COMPONENT. Он нь build-time дээр тогтоно
    (static хуудас тул) — жил солигдоход дараагийн deploy-д
    шинэчлэгдэнэ. Client-side `Date` хэрэглэвэл hydration
    зөрчил үүсгэх тул зориуд серверт л тооцов. */
-export default function Footer() {
+export default async function Footer() {
+  const { t, c, href } = await getI18n();
+  const { site } = c;
   return (
     <footer className="foot">
       {/* Дээд мөр: брэнд + дөрвөн бүлэг холбоос (худалдан авагчийн зам) */}
@@ -23,13 +25,13 @@ export default function Footer() {
             {site.role} — {site.legal}.
           </p>
         </div>
-        {footerGroups.map((g) => (
+        {c.footerGroups.map((g) => (
           <nav key={g.title} aria-label={g.title}>
             <strong>{g.title}</strong>
             <ul className="foot__links">
               {g.links.map((l) => (
                 <li key={l.href + l.label}>
-                  <a href={l.href}>{l.label}</a>
+                  <a href={href(l.href)}>{l.label}</a>
                 </li>
               ))}
             </ul>
@@ -40,7 +42,7 @@ export default function Footer() {
       {/* Доод мөр: шоурум, цаг, хууль зүйн мэдээлэл */}
       <div className="foot__in foot__meta">
         <div>
-          <strong>Шоурум</strong>
+          <strong>{t("footer.showroom")}</strong>
           {site.address.line1}
           <br />
           {site.address.line2}
@@ -48,12 +50,12 @@ export default function Footer() {
           <a href={site.phoneHref}>{site.phone}</a>
         </div>
         <div>
-          <strong>Цагийн хуваарь</strong>
+          <strong>{t("footer.hours")}</strong>
           <ul className="foot__hours">
-            {site.hours.map(([d, t]) => (
+            {site.hours.map(([d, h]) => (
               <li key={d}>
                 <span>{d}</span>
-                <span>{t}</span>
+                <span>{h}</span>
               </li>
             ))}
           </ul>
@@ -62,13 +64,11 @@ export default function Footer() {
 
       <div className="foot__in">
         <p className="foot__legal">
-          © {new Date().getFullYear()} {site.legal}. Бүх эрх хуулиар хамгаалагдсан.
+          © {new Date().getFullYear()} {site.legal}. {t("footer.rights")}
         </p>
       </div>
 
-      {/* Хаалтын брэнд wordmark — хулгана хөдлөхөд улаанаар асна.
-          Контент биш, чимэглэл тул `aria-hidden` (лого дээр нэр
-          аль хэдийн уншигдсан). */}
+      {/* Хаалтын брэнд wordmark — чимэглэл тул `aria-hidden`. */}
       <div className="foot-brand" aria-hidden="true">
         <BrandReveal text="CHERY" />
       </div>
